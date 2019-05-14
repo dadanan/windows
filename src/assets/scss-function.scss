@@ -1,0 +1,13 @@
+@function tvw($pt) {
+  @return ($pt / 3125) * 100vw;
+}
+
+@function -tvw($pt) {
+  @return -($pt / 3125) * 100vw;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}

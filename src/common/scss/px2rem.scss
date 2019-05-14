@@ -1,0 +1,7 @@
+$design-width: 750px;
+$base-viewport-width: 320px;
+$base-font-size: 14px;
+
+@function px2rem($px: $base-font-size) {
+@return ($px + 0px) / $base-font-size * 1rem * ($base-viewport-width / $design-width);
+}
