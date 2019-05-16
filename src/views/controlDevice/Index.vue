@@ -2,6 +2,7 @@
   <div class="main-wrapper" v-show='pageIsShow' :class="{ active: isOpen === true }" @touchmove.prevent :style="{ 'background-image': 'url(' + img + ')'}">
     <div class="header">
       <div class="return" @click="returnMethod"></div>
+      <span>{{ deviceName }}</span>
       <span class="edit" @click="intoSet"></span>
       <span class="time" v-if="1===2"></span>
     </div>
@@ -14,124 +15,20 @@
       <span>PM2.5: {{getOuterPM}}ug/m3&nbsp;&nbsp;</span>
     </div>
 
-    <!-- 底部按钮 -->
-    <div class="footer fixed">
-      <div class="but-list">
-        <div class="but-group" @click="functionFlag = !functionFlag">
-          <div class="icon menu"></div>
-          <!-- 功能 -->
-          <div class="text">功能</div>
-        </div>
-        <div class="but-group" @click="showWater">
-          <div class="icon water-temp"></div>
-          <!-- 水温 -->
-          <div class="text">水温</div>
-        </div>
-        <div class="but-group" @click="showBreakdown">
-          <div class="icon breakdown"></div>
-          <!-- 故障 -->
-          <div class="text">故障</div>
-        </div>
-        <div class="but-group" @click="showHotWater">
-          <div class="icon hot-water"></div>
-          <!-- 热水 -->
-          <div class="text">热水</div>
-        </div>
+    <div class="panel">
+      <div class="card" @click="switchMode('1')">
+        <div class="icon cold"></div>
+        <p :class="{active: currMode==='1'}">主机制冷</p>
       </div>
-
-      <transition name="fade">
-        <!-- 功能面板 -->
-        <div class="but-list" v-show="functionFlag">
-          <div class="but-group" @click="onOffMethod">
-            <div class="icon" :class="isOpen ? 'on-off-open' : 'on-off'"></div>
-            <div class="text">开关机</div>
-          </div>
-          <div class="but-group" @click="switchMode('1')">
-            <div class="icon zhileng"></div>
-            <div class="text">制冷</div>
-          </div>
-          <div class="but-group" @click="switchMode('8')">
-            <div class="icon gongnuan"></div>
-            <div class="text">供暖</div>
-          </div>
-        </div>
-      </transition>
+      <div class="card" @click="switchMode('8')">
+        <div class="icon hot"></div>
+        <p :class="{active: currMode==='8'}">主机制热</p>
+      </div>
     </div>
 
-    <!-- 故障 -->
-    <yd-popup v-model="breakdownFlag" position="bottom" width="90%">
-      <div class="content">
-        <div class="icon">
-          <div class="breakdown"></div>
-        </div>
-        <div class="item">
-          <div class="title">
-            故障状态
-            <div class="state success" v-if="breakdownList.length===0">正常</div>
-            <div class="state error" v-else>故障</div>
-          </div>
-          <div class="list" v-if="breakdownList.length>0">
-            <ul>
-              <li v-for="item in breakdownList">
-                <span class="code"><span class="gray">代码:&nbsp;</span>{{item.code}}</span>
-                <span class="line"></span>
-                <span class="desc"><span class="gray">描述:&nbsp;</span>{{item.desc}}</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </yd-popup>
-
-    <!-- 热水 -->
-    <yd-popup v-model="hotWaterFlag" position="bottom" width="90%">
-      <div class="content hotwater">
-        <div class="icon">
-          <div class="on-off"></div>
-          <p class="desc">开关机</p>
-        </div>
-        <div class="item hotwater-item">
-          <div class="card up">
-            <p class="num">{{hotwater}}°</p>
-            <p class="desc">设定当前温度</p>
-          </div>
-          <div class="block">
-            <span class="min">0°</span>
-            <el-slider class="hotwater-slider" v-model="hotwater" :min="0" :max="60" :show-tooltip="false" @change="handleChangeHotWaterSlider"></el-slider>
-            <span class="max">60°</span>
-          </div>
-          <div class="card down" :style="{left: leftHotwater+ '%'}">
-            <p class="num">{{hotwater}}°</p>
-            <p class="desc">当前温度</p>
-          </div>
-        </div>
-      </div>
-    </yd-popup>
-
-    <!-- 水温 -->
-    <yd-popup v-model="waterTempFlag" position="bottom" width="90%">
-      <div class="content">
-        <div class="item water-item">
-          <div class="card up">
-            <p class="num">{{waterTemp}}°</p>
-            <p class="desc">设定回水温度</p>
-          </div>
-          <div class="block">
-            <span class="min">0°</span>
-            <el-slider class="water-slider" v-model="waterTemp" :min="0" :max="60" :show-tooltip="false" @change="handleChangeWaterSlider"></el-slider>
-            <span class="max">60°</span>
-          </div>
-          <div class="card down" :style="{left:leftWater1+ '%'}">
-            <p class="num">{{waterTemp1}}°</p>
-            <p class="desc">供水温度</p>
-          </div>
-          <div class="card down" :style="{left:leftWater2+ '%'}">
-            <p class="num">{{waterTemp2}}°</p>
-            <p class="desc">回水温度</p>
-          </div>
-        </div>
-      </div>
-    </yd-popup>
+    <div class="switch" @click="onOffMethod">
+      主机开关
+    </div>
 
   </div>
 </template>
@@ -143,7 +40,7 @@ import { setWechatTitle } from "utils";
 import img1 from "../../assets/bak3.jpg"; // 白天阴
 import img2 from "../../assets/bak2.jpg"; // 夜晚阴
 import img3 from "../../assets/bak1.jpg"; // 夜晚晴
-import img4 from "../../assets/rebeng/bak4.jpeg"; // 白天晴
+import img4 from "../../assets/rebeng/bak5.jpeg"; // 白天晴
 import Store from "../wenkong/store.js";
 import {
   getModelVo,
@@ -164,6 +61,7 @@ export default {
       sunnyDay: img4, // 晴天
       cloudyNight: img2, // 夜晚阴
       sunnyNight: img3, // 夜晚晴
+      deviceName: "",
       pageIsShow: false,
       img: img4,
       customerName: "",
@@ -280,46 +178,6 @@ export default {
   methods: {
     returnMethod () {
       this.$router.back(-1);
-    },
-    handleChangeHotWaterSlider () {
-      let slider = document.querySelector('.hotwater-slider')
-      let block = document.querySelector('.hotwater-item')
-      if (slider === null || block === null) {
-        return false
-      }
-      this.leftHotwater = (this.hotwater / 60) * (slider.offsetWidth / block.offsetWidth) * 100
-    },
-    handleChangeWaterSlider () {
-      let tempArray = {};
-      if (this.currMode == '1') {
-        tempArray = this.abilitysList.find(item => item.abilityId == this.formatItemsList[5].abilityId);
-      } else if (this.currMode == '8') {
-        tempArray = this.abilitysList.find(item => item.abilityId == this.formatItemsList[6].abilityId);
-      }
-
-      if (JSON.stringify(tempArray) === '{}') {
-        return false;
-      }
-
-      sendFunc({
-        deviceId: this.deviceId,
-        funcId: tempArray.dirValue,
-        value: this.waterTemp
-      }).then(res => {
-        if (res.code === 200) {
-          Toast({
-            mes: "发送成功",
-            timeout: 1000,
-            icon: "success"
-          });
-          console.info(
-            "指令发送成功:",
-            tempArray.dirValue,
-            "-",
-            this.waterTemp
-          );
-        }
-      });
     },
     intoSet () {
       if (!this.isOpen) {
@@ -502,80 +360,9 @@ export default {
         // 制冷、制热
         const data = this.abilitysList.find(item => item.abilityId == this.formatItemsList[9].abilityId);
         this.currMode = data.currValue;
-
-        let tempArray = {};
-        if (this.currMode == '1') {
-          tempArray = this.abilitysList.find(item => item.abilityId == this.formatItemsList[5].abilityId);
-        } else if (this.currMode == '8') {
-          tempArray = this.abilitysList.find(item => item.abilityId == this.formatItemsList[6].abilityId);
-        }
-        this.waterTemp = Number(tempArray.currValue)
       }
 
-      // 更新故障
-      const updateBreakdown = () => {
-        this.breakdownList = []
-        // 空调水流故障
-        const data1 = this.abilitysList.find(item => item.abilityId == this.formatItemsList[1].abilityId);
-        // 冷却水流故障
-        const data2 = this.abilitysList.find(item => item.abilityId == this.formatItemsList[2].abilityId);
-        // 出水低温告警
-        const data3 = this.abilitysList.find(item => item.abilityId == this.formatItemsList[3].abilityId);
-        // 出水高温告警
-        const data4 = this.abilitysList.find(item => item.abilityId == this.formatItemsList[4].abilityId);
-
-        const tempArray1 = data1.abilityOptionList;
-        const tempArray2 = data2.abilityOptionList;
-        const tempArray3 = data3.abilityOptionList;
-        const tempArray4 = data4.abilityOptionList;
-        // 根据isSelect的值，对相应选项执行默认选中行为
-        // 找到空调水流故障的对象
-        const tempObj1 = tempArray1[0].dirValue == 0 ? tempArray1[0] : tempArray1[1];
-        const tempObj2 = tempArray2[0].dirValue == 0 ? tempArray2[0] : tempArray2[1];
-        const tempObj3 = tempArray3[0].dirValue == 0 ? tempArray3[0] : tempArray3[1];
-        const tempObj4 = tempArray4[0].dirValue == 0 ? tempArray4[0] : tempArray4[1];
-        if (tempObj1.isSelect === 0) {
-          // 故障
-          this.breakdownList.push({
-            code: data1.dirValue,
-            desc: data1.abilityName
-          })
-        }
-        if (tempObj2.isSelect === 0) {
-          // 故障
-          this.breakdownList.push({
-            code: data2.dirValue,
-            desc: data2.abilityName
-          })
-        }
-        if (tempObj3.isSelect === 0) {
-          // 故障
-          this.breakdownList.push({
-            code: data3.dirValue,
-            desc: data3.abilityName
-          })
-        }
-        if (tempObj4.isSelect === 0) {
-          // 故障
-          this.breakdownList.push({
-            code: data4.dirValue,
-            desc: data4.abilityName
-          })
-        }
-      };
-
-      const updateTemp = () => {
-        // 供水温度
-        const data1 = this.abilitysList.find(item => item.abilityId == this.formatItemsList[7].abilityId);
-        // 回水温度
-        const data2 = this.abilitysList.find(item => item.abilityId == this.formatItemsList[8].abilityId);
-        this.waterTemp1 = data1.currValue / 10;
-        this.waterTemp2 = data2.currValue / 10;
-      };
-
       updateCurrData();
-      updateBreakdown();
-      updateTemp();
     },
     setWeather () {
       // 当前天气模式
@@ -681,40 +468,6 @@ export default {
         this.cloudyNight = bgImgs[4];
       }
     },
-    showBreakdown (id) {
-      if (!this.isOpen) {
-        this.$toast("当前关机状态，不可操作", "bottom");
-        return false;
-      }
-      this.breakdownFlag = true;
-    },
-    showWater () {
-      if (!this.isOpen) {
-        this.$toast("当前关机状态，不可操作", "bottom");
-        return false;
-      }
-      this.waterTempFlag = true
-      this.$nextTick(() => {
-        // 设置供水、回水温度在 slider 上的位置
-        let slider = document.querySelector('.water-slider')
-        let block = document.querySelector('.water-item')
-        if (slider === null || block === null) {
-          return false
-        }
-        this.leftWater1 = (this.waterTemp1 / 60) * (slider.offsetWidth / block.offsetWidth) * 100
-        this.leftWater2 = (this.waterTemp2 / 60) * (slider.offsetWidth / block.offsetWidth) * 100
-      })
-    },
-    showHotWater () {
-      if (!this.isOpen) {
-        this.$toast("当前关机状态，不可操作", "bottom");
-        return false;
-      }
-      this.hotWaterFlag = true
-      this.$nextTick(() => {
-        this.handleChangeHotWaterSlider()
-      })
-    },
     switchMode (index) {
       if (!this.isOpen) {
         this.$toast("当前关机状态，不可操作", "bottom");
@@ -753,6 +506,7 @@ export default {
     if (window.innerWidth <= 340) {
       this.cHeight = window.innerWidth * 0.45;
     }
+    this.deviceName = Store.fetch("deviceName");
     this.customerName = Store.fetch("customerName");
     setWechatTitle(this.customerName, "");
 
@@ -846,248 +600,50 @@ export default {
       background-size: 20px 20px;
     }
   }
-  .content {
-    padding: 20px 15px 30px 15px;
-    color: #000000;
-    background: #ffffff;
-    display: flex;
-    align-items: flex-start;
-    &.hotwater {
-      align-items: center;
-    }
-    .icon {
-      width: 40px;
-      height: 40px;
-      margin-right: 10px;
-      box-sizing: content-box;
-      .breakdown {
-        background: url("../../assets/rebeng/breakdown-icon.png") no-repeat
-          center center;
-        background-size: 35px 35px;
-        width: 35px;
-        height: 35px;
-      }
-      .on-off {
-        background: url("../../assets/rebeng/on-off-black.png") no-repeat center
-          center;
-        background-size: 35px 35px;
-        width: 35px;
-        height: 35px;
-        border: 1px solid #333333;
-        border-radius: 100%;
-      }
-      .desc {
-        margin-top: 5px;
-        font-size: 11px;
-        color: #333333;
-      }
-    }
-    .item {
-      flex: 1;
-      width: 100%;
-      position: relative;
-      margin-bottom: 45px;
-      .title {
-        font-size: 22px;
-        position: relative;
-        height: 35px;
-        line-height: 35px;
-        margin-bottom: 20px;
-        .state {
-          float: right;
-          font-weight: bold;
-          &::before {
-            position: absolute;
-            content: "";
-            width: 30px;
-            height: 30px;
-            right: 45px;
-            top: 1px;
-          }
-          &.success {
-            color: #00be8b;
-            &::before {
-              background: url("../../assets/rebeng/gouhao.png") no-repeat center
-                center;
-              background-size: 30px 30px;
-            }
-          }
-          &.error {
-            color: #f92400;
-            &::before {
-              background: url("../../assets/rebeng/warningo.png") no-repeat
-                center center;
-              background-size: 30px 30px;
-            }
-          }
-        }
-      }
-      .list {
-        border-top: 1px solid #dfdfdf;
-        & ul li {
-          font-size: 13px;
-          margin-top: 20px;
-          .gray {
-            color: #9a9a9a;
-            &::before {
-              display: inline-block;
-              width: 10px;
-              height: 10px;
-              border-radius: 50%;
-              background: linear-gradient(to top right, #599aff, #9a57ff);
-              content: "";
-              margin-right: 5px;
-            }
-          }
-          .code,
-          .desc {
-            font-size: 13px;
-          }
-          .line {
-            border: 1px solid #dfdfdf;
-            margin: 0 20px;
-          }
-        }
-      }
-      .block {
-        display: flex;
-        align-items: center;
-        font-size: 14px;
-        font-weight: bold;
-        .min {
-          color: #4ca6ff;
-          width: 24px;
-        }
-        .max {
-          color: #ff874c;
-          width: 32px;
-          text-align: right;
-        }
-      }
-      .card {
-        display: inline-block;
-        text-align: center;
-        &.up {
-          display: block;
-        }
-        &.down {
-          position: absolute;
-          &::before {
-            content: "";
-            height: 17px;
-            width: 2px;
-            background-color: #4ca6ff;
-            position: absolute;
-            top: -20px;
-          }
-        }
-        .num {
-          font-size: 22px;
-          color: #333333;
-        }
-        .desc {
-          font-size: 12px;
-          color: #999999;
-        }
-      }
-    }
-  }
-  .footer {
-    margin-top: 10px;
+  .panel {
     text-align: center;
-    font-size: 13px;
-    @media only screen and (min-device-width: 320px) and (max-device-width: 340px) {
-      margin-top: 10px;
-    }
-    &.fixed {
-      position: fixed;
-      bottom: 10px;
-      width: 100%;
-    }
-    .but-list {
-      display: flex;
-      &:not(:first-child) {
-        margin-top: 20px;
+    margin-top: 90px;
+    .card {
+      display: inline-block;
+      width: 115px;
+      height: 115px;
+      background: rgba(255, 255, 255, 0.13);
+      font-size: 14px;
+      color: #e0e0e0;
+      margin: 0 25px;
+      & p.active {
+        color: #7fffe7;
       }
-      .but-group {
-        flex: 1;
-        & .icon {
-          width: 35px;
-          height: 35px;
-          border: 1px solid #ffffff;
-          border-radius: 100%;
-          margin: 0 auto;
-          margin-bottom: 5px;
-          &.on-off {
-            background: url("../../assets/rebeng/on-off.png") no-repeat center
-              center;
-            background-size: 38px 36px;
-          }
-          &.on-off-open {
-            background: url("../../assets/rebeng/on-off-open.png") no-repeat
-              center center;
-            background-size: 38px 36px;
-          }
-          &.zhileng {
-            background: url("../../assets/rebeng/zhileng.png") no-repeat center
-              center;
-            background-size: 38px 36px;
-          }
-          &.gongnuan {
-            background: url("../../assets/rebeng/gongnuan.png") no-repeat center
-              center;
-            background-size: 38px 36px;
-          }
-          &.water-temp {
-            background: url("../../assets/rebeng/water-temperature.png")
-              no-repeat center center;
-            background-size: 38px 36px;
-          }
-          &.breakdown {
-            background: url("../../assets/rebeng/breakdown.png") no-repeat
-              center center;
-            background-size: 38px 36px;
-          }
-          &.hot-water {
-            background: url("../../assets/rebeng/hot-water.png") no-repeat
-              center center;
-            background-size: 38px 36px;
-          }
-          &.menu {
-            background: url("../../assets/menu.png") no-repeat center center;
-            background-size: 18px 16px;
-          }
+      .icon {
+        width: 45px;
+        height: 45px;
+        border: 1px solid #ffffff;
+        border-radius: 100%;
+        margin: 20px auto 15px auto;
+        &.cold {
+          background: url("../../assets/rebeng/zhileng.png") no-repeat center
+            center;
+          background-size: 48px 46px;
+        }
+        &.hot {
+          background: url("../../assets/rebeng/gongnuan.png") no-repeat center
+            center;
+          background-size: 48px 46px;
         }
       }
     }
   }
-}
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>
-<style rel="stylesheet/scss" lang="scss">
-.water-slider,
-.hotwater-slider {
-  flex: 1;
-  .el-slider__runway {
-    background: linear-gradient(
-      to right,
-      #4ca6ff,
-      #9556ff,
-      #f44cf0,
-      #ff66a1,
-      #ff7e63,
-      #ff874c
-    );
-  }
-  .el-slider__bar {
-    background-color: unset;
+  .switch {
+    background: #7fffe7;
+    color: #ffffff;
+    width: 60%;
+    text-align: center;
+    font-size: 18px;
+    display: block;
+    margin: 0 auto;
+    padding: 15px 0;
+    margin-top: 140px;
+    border-radius: 50px;
   }
 }
 </style>

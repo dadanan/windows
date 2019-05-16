@@ -38,6 +38,7 @@ const WenKongIndex = resolve => require(['@/views/wenkong/Index'], resolve)
 const AirPurifier = resolve => require(['@/views/air-purifier'], resolve)
 const KaiChe = resolve => require(['@/views/kaiche'], resolve)
 const ReBengIndex = resolve => require(['@/views/rebeng/Index'], resolve)
+const ControlDeviceIndex = resolve => require(['@/views/controlDevice/Index'], resolve)
 
 let routes = [
   {
@@ -240,6 +241,13 @@ let routes = [
   {
     path: '/rebengindex',
     component: ReBengIndex,
+    meta: {
+      title: ''
+    }
+  },
+  {
+    path: '/controldeviceindex',
+    component: ControlDeviceIndex,
     meta: {
       title: ''
     }

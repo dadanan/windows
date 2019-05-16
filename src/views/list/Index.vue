@@ -615,6 +615,12 @@ export default {
           path: "/rebengindex",
           query
         });
+      } else if (child.formatName === "中控器") {
+        // 纯检测器
+        this.$router.push({
+          path: "/controldeviceindex",
+          query
+        });
       }
     },
     selectDev (id) {

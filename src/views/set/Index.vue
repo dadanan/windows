@@ -42,7 +42,8 @@
 
       <div class="cell-item white" @click="intoData">
         <div class="cell-left">
-          <span>数据曲线图</span>
+          <span v-if="formatName==='地源热泵'">供水温度曲线、回水温度曲线</span>
+          <span v-else>数据曲线图</span>
         </div>
         <div class="cell-right"></div>
       </div>
@@ -53,7 +54,16 @@
         <div class="cell-right">
         </div>
       </div>
-      <div class="cell-item white" @click="intoBattery" v-if="screen">
+
+      <div class="cell-item white" v-if="formatName==='地源热泵'">
+        <div class="cell-left">
+          <span>清洗时间</span>
+        </div>
+        <div class="cell-right">
+          <span>半年</span>
+        </div>
+      </div>
+      <div class="cell-item white" @click="intoBattery" v-else-if="screen">
         <div class="cell-left">
           <span>滤芯寿命</span>
         </div>
@@ -163,7 +173,7 @@
           <p>客服电话</p>
         </div>
         <div class="confim-content">
-          
+
           <a href="tel:4001181789#mp.weixin.qq.com">{{ customer1 }}</a>
         </div>
         <div class="confim-bottom">
@@ -219,7 +229,7 @@ import {
 } from "../wenkong/api";
 
 export default {
-  data() {
+  data () {
     return {
       switch1: false,
       switch2: false,
@@ -246,11 +256,12 @@ export default {
       options1: [],
       feedBacks: "",
       list: [],
-      screen: false
+      screen: false,
+      formatName: ''
     };
   },
   computed: {
-    showMasterInfo() {
+    showMasterInfo () {
       // 展示主机开关和主机模式入口？
       // 需要：1.目前只能是新风版式跳转过来的 2.用户选择了这两个功能项 3.存在从机
       if (
@@ -269,7 +280,7 @@ export default {
     }
   },
   methods: {
-    getIndexAbilityData() {
+    getIndexAbilityData () {
       // 获取H5控制页面功能项数据，带isSelect参数
       getModelVo({ deviceId: this.$route.query.deviceId, pageNo: 1 }).then(
         res => {
@@ -284,7 +295,7 @@ export default {
         }
       );
     },
-    getToken() {
+    getToken () {
       // 高级设置Token
       getToken({
         customerId: this.customerId,
@@ -304,13 +315,13 @@ export default {
         }
       });
     },
-    getServerUser() {
+    getServerUser () {
       // 客服
       getServerUser().then(res => {
         this.customer1 = res.data;
       });
     },
-    sub() {
+    sub () {
       if (this.feedBacks.length > 0 && this.feedBacks.length < 100) {
         repairInfo({
           deviceId: this.deviceId,
@@ -363,7 +374,7 @@ export default {
     //     }
     //   });
     // },
-    customMessage() {
+    customMessage () {
       // 反馈意见
       if (this.feedBack.length > 0 && this.feedBack.length < 100) {
         this.UserFeedBack = false;
@@ -385,10 +396,10 @@ export default {
         });
       }
     },
-    returnMethod() {
+    returnMethod () {
       this.$router.back(-1);
     },
-    intoShare() {
+    intoShare () {
       this.$router.push({
         path: "/share",
         query: {
@@ -397,7 +408,7 @@ export default {
         }
       });
     },
-    intoMap() {
+    intoMap () {
       this.$router.push({
         path: "/map",
         query: {
@@ -406,7 +417,7 @@ export default {
         }
       });
     },
-    intoPermissions() {
+    intoPermissions () {
       this.$router.push({
         path: "/permissions",
         query: {
@@ -414,10 +425,10 @@ export default {
         }
       });
     },
-    intoConfig() {
+    intoConfig () {
       this.setPwdFlag = true;
     },
-    intoBattery() {
+    intoBattery () {
       this.$router.push({
         path: "/battery",
         query: {
@@ -425,7 +436,7 @@ export default {
         }
       });
     },
-    intoData() {
+    intoData () {
       this.$router.push({
         path: "/data",
         query: {
@@ -433,7 +444,7 @@ export default {
         }
       });
     },
-    record() {
+    record () {
       this.$router.push({
         path: "/record",
         query: {
@@ -441,7 +452,7 @@ export default {
         }
       });
     },
-    editDev() {
+    editDev () {
       Loading.open("很快加载好了");
       editDevice({
         deviceId: this.deviceId,
@@ -460,7 +471,7 @@ export default {
           this.$toast(error.msg, "bottom");
         });
     },
-    intoInfo() {
+    intoInfo () {
       this.$router.push({
         path: "/devinfo",
         query: {
@@ -468,7 +479,7 @@ export default {
         }
       });
     },
-    intoMasterInfo() {
+    intoMasterInfo () {
       this.$router.push({
         path: "/masterinfo",
         query: {
@@ -478,7 +489,7 @@ export default {
       });
     }
   },
-  created() {
+  created () {
     this.getIndexAbilityData();
     // this.getRuleInfo();
     this.getServerUser();
@@ -490,11 +501,12 @@ export default {
       Loading.close();
     }, 300);
   },
-  mounted() {
+  mounted () {
     this.deviceName = Store.fetch("deviceName");
+    this.formatName = Store.fetch("formatName");
   },
   watch: {
-    pwd: function() {
+    pwd: function () {
       if (this.pwd && this.pwd.length > 0) {
         if (this.pwd.length >= 4) {
           this.pwd = this.pwd.slice(0, 4);
