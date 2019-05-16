@@ -241,7 +241,8 @@ export default {
       Loading.close();
       sendFunc({
         deviceId: this.deviceId,
-        funcId: tempArray.dirValue,
+        // funcId: tempArray.dirValue,
+        funcId: '2C0',
         value: tempList[index].dirValue
       }).then(res => {
         this.isOpen = !this.isOpen;
@@ -481,7 +482,8 @@ export default {
       const tempList = tempArray.abilityOptionList;
       sendFunc({
         deviceId: this.deviceId,
-        funcId: tempArray.dirValue,
+        //funcId: tempArray.dirValue,
+        funcId: '210',
         value: index
       }).then(res => {
         if (res.code === 200) {

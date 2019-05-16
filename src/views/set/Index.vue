@@ -40,13 +40,14 @@
         </div>
       </div>
 
-      <div class="cell-item white" @click="intoData">
+      <div class="cell-item white" @click="intoData" v-if="formatName!=='中控器'">
         <div class="cell-left">
           <span v-if="formatName==='地源热泵'">供水温度曲线、回水温度曲线</span>
           <span v-else>数据曲线图</span>
         </div>
         <div class="cell-right"></div>
       </div>
+
       <div class="cell-item white" @click="intoMap">
         <div class="cell-left">
           <span>手动设置位置</span>
@@ -55,12 +56,12 @@
         </div>
       </div>
 
-      <div class="cell-item white" v-if="formatName==='地源热泵'">
+      <div class="cell-item white" v-if="formatName==='地源热泵'||formatName==='中控器'">
         <div class="cell-left">
           <span>清洗时间</span>
         </div>
         <div class="cell-right">
-          <span>半年</span>
+          <span>默认为半年</span>
         </div>
       </div>
       <div class="cell-item white" @click="intoBattery" v-else-if="screen">
