@@ -621,6 +621,12 @@ export default {
           path: "/controldeviceindex",
           query
         });
+      } else if (child.formatName === "风冷热泵") {
+        // 纯检测器
+        this.$router.push({
+          path: "/aircoolindex",
+          query
+        });
       }
     },
     selectDev (id) {
