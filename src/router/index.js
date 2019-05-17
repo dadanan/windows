@@ -39,6 +39,7 @@ const AirPurifier = resolve => require(['@/views/air-purifier'], resolve)
 const KaiChe = resolve => require(['@/views/kaiche'], resolve)
 const ReBengIndex = resolve => require(['@/views/rebeng/Index'], resolve)
 const ControlDeviceIndex = resolve => require(['@/views/controlDevice/Index'], resolve)
+const AirCoolIndex = resolve => require(['@/views/indexAirCool/Index'], resolve)
 
 let routes = [
   {
@@ -248,6 +249,13 @@ let routes = [
   {
     path: '/controldeviceindex',
     component: ControlDeviceIndex,
+    meta: {
+      title: ''
+    }
+  },
+  {
+    path: '/aircoolindex',
+    component: AirCoolIndex,
     meta: {
       title: ''
     }

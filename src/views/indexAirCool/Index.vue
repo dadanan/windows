@@ -14,124 +14,89 @@
       <span>PM2.5: {{getOuterPM}}ug/m3&nbsp;&nbsp;</span>
     </div>
 
-    <!-- 底部按钮 -->
-    <div class="footer fixed">
-      <div class="but-list">
-        <div class="but-group" @click="functionFlag = !functionFlag">
-          <div class="icon menu"></div>
-          <!-- 功能 -->
-          <div class="text">功能</div>
-        </div>
-        <div class="but-group" @click="showWater">
-          <div class="icon water-temp"></div>
-          <!-- 水温 -->
-          <div class="text">水温</div>
-        </div>
-        <div class="but-group" @click="showBreakdown">
-          <div class="icon breakdown"></div>
-          <!-- 故障 -->
-          <div class="text">故障</div>
-        </div>
-        <div class="but-group" @click="showHotWater">
-          <div class="icon hot-water"></div>
-          <!-- 热水 -->
-          <div class="text">热水</div>
-        </div>
+    <div class="mode-panel">
+      <div class="card" @click="switchMode('8')">
+        <div class="icon hot" :class="{active: isOpen&&currMode==='8'}"></div>
+        <p class="text hot" :class="{active: isOpen&&currMode==='8'}">制热</p>
       </div>
-
-      <transition name="fade">
-        <!-- 功能面板 -->
-        <div class="but-list" v-show="functionFlag">
-          <div class="but-group" @click="onOffMethod">
-            <div class="icon" :class="isOpen ? 'on-off-open' : 'on-off'"></div>
-            <div class="text">开关机</div>
-          </div>
-          <div class="but-group" @click="switchMode('1')">
-            <div class="icon zhileng"></div>
-            <div class="text">制冷</div>
-          </div>
-          <div class="but-group" @click="switchMode('8')">
-            <div class="icon gongnuan"></div>
-            <div class="text">供暖</div>
-          </div>
-        </div>
-      </transition>
+      <div class="card" @click="switchMode('1')">
+        <div class="icon cold" :class="{active: isOpen&&currMode==='1'}"></div>
+        <p class="text cold" :class="{active: isOpen&&currMode==='1'}">制冷</p>
+      </div>
+      <div class="card" @click="onOffMethod">
+        <div class="icon switch" :class="{active: isOpen}"></div>
+        <p class="text switch" :class="{active: isOpen}">开关</p>
+      </div>
     </div>
 
-    <!-- 故障 -->
-    <yd-popup v-model="breakdownFlag" position="bottom" width="90%">
-      <div class="content">
-        <div class="icon">
-          <div class="breakdown"></div>
+    <div class="panel">
+      <div class="item">
+        <div class="card up">
+          <p class="num" :class="currMode==='1' ? 'cold' : currMode==='8' ? 'hot' : ''">{{waterTemp}}°</p>
+          <p class="desc">设定回水温度</p>
         </div>
-        <div class="item">
-          <div class="title">
-            故障状态
-            <div class="state success" v-if="breakdownList.length===0">正常</div>
-            <div class="state error" v-else>故障</div>
-          </div>
-          <div class="list" v-if="breakdownList.length>0">
-            <ul>
-              <li v-for="item in breakdownList">
-                <span class="code"><span class="gray">代码:&nbsp;</span>{{item.code}}</span>
-                <span class="line"></span>
-                <span class="desc"><span class="gray">描述:&nbsp;</span>{{item.desc}}</span>
-              </li>
-            </ul>
-          </div>
+        <div class="block" v-if="currMode==='8'">
+          <span class="min">0°</span>
+          <el-slider class="water-slider" :disabled="!isOpen" v-model="waterTemp" :min="0" :max="60" :show-tooltip="false" @change="handleChangeWaterSlider"></el-slider>
+          <span class="max">60°</span>
+        </div>
+        <div class="block" v-else>
+          <span class="min">0°</span>
+          <el-slider class="water-slider" :disabled="!isOpen" v-model="waterTemp" :min="0" :max="25" :show-tooltip="false" @change="handleChangeWaterSlider"></el-slider>
+          <span class="max cold">25°</span>
+        </div>
+        <div class="card down" :style="{left:leftWater1+ '%'}">
+          <p class="num">{{waterTemp1}}°</p>
+          <p class="desc">供水温度</p>
+        </div>
+        <div class="card down" :style="{left:leftWater2+ '%'}">
+          <p class="num">{{waterTemp2}}°</p>
+          <p class="desc">回水温度</p>
         </div>
       </div>
-    </yd-popup>
+    </div>
 
-    <!-- 热水 -->
-    <yd-popup v-model="hotWaterFlag" position="bottom" width="90%">
-      <div class="content hotwater">
-        <div class="icon">
-          <div class="on-off"></div>
-          <p class="desc">开关机</p>
+    <div class="panel">
+      <div class="title">
+        <div class="icon hotwater">热水</div>
+        <el-switch v-model="value2" :disabled="!isOpen" active-color="#2921ff" inactive-color="#2b2a63" :width="45">
+        </el-switch>
+      </div>
+      <div class="item">
+        <div class="card up">
+          <p class="num hot">{{hotwater}}°</p>
+          <p class="desc">设定当前温度</p>
         </div>
-        <div class="item hotwater-item">
-          <div class="card up">
-            <p class="num">{{hotwater}}°</p>
-            <p class="desc">设定当前温度</p>
-          </div>
-          <div class="block">
-            <span class="min">0°</span>
-            <el-slider class="hotwater-slider" v-model="hotwater" :min="0" :max="60" :show-tooltip="false" @change="handleChangeHotWaterSlider"></el-slider>
-            <span class="max">60°</span>
-          </div>
-          <div class="card down" :style="{left: leftHotwater+ '%'}">
-            <p class="num">{{hotwater}}°</p>
-            <p class="desc">当前温度</p>
-          </div>
+        <div class="block">
+          <span class="min">0°</span>
+          <el-slider class="hotwater-slider" :disabled="!isOpen" v-model="hotwater" :min="0" :max="60" :show-tooltip="false" @change="handleChangeHotWaterSlider"></el-slider>
+          <span class="max">60°</span>
+        </div>
+        <div class="card down" :style="{left: leftHotwater+ '%'}">
+          <p class="num">{{hotwater}}°</p>
+          <p class="desc">当前温度</p>
         </div>
       </div>
-    </yd-popup>
+    </div>
 
-    <!-- 水温 -->
-    <yd-popup v-model="waterTempFlag" position="bottom" width="90%">
-      <div class="content">
-        <div class="item water-item">
-          <div class="card up">
-            <p class="num">{{waterTemp}}°</p>
-            <p class="desc">设定回水温度</p>
-          </div>
-          <div class="block">
-            <span class="min">0°</span>
-            <el-slider class="water-slider" v-model="waterTemp" :min="0" :max="60" :show-tooltip="false" @change="handleChangeWaterSlider"></el-slider>
-            <span class="max">60°</span>
-          </div>
-          <div class="card down" :style="{left:leftWater1+ '%'}">
-            <p class="num">{{waterTemp1}}°</p>
-            <p class="desc">供水温度</p>
-          </div>
-          <div class="card down" :style="{left:leftWater2+ '%'}">
-            <p class="num">{{waterTemp2}}°</p>
-            <p class="desc">回水温度</p>
-          </div>
+    <div class="panel">
+      <div class="title">
+        <div class="icon break">状态</div>
+        <div class="state" v-if="breakdownList.length===0"><i class="el-icon-success"></i>正常</div>
+        <div class="state" v-else><i class="el-icon-warning"></i>预警</div>
+      </div>
+      <div class="item">
+        <div class="list" v-if="breakdownList.length>0">
+          <ul>
+            <li v-for="item in breakdownList">
+              <span class="code">代码:&nbsp;{{item.code}}</span>
+              <span class="line"></span>
+              <span class="desc">描述:&nbsp;{{item.desc}}</span>
+            </li>
+          </ul>
         </div>
       </div>
-    </yd-popup>
+    </div>
 
   </div>
 </template>
@@ -143,7 +108,7 @@ import { setWechatTitle } from "utils";
 import img1 from "../../assets/bak3.jpg"; // 白天阴
 import img2 from "../../assets/bak2.jpg"; // 夜晚阴
 import img3 from "../../assets/bak1.jpg"; // 夜晚晴
-import img4 from "../../assets/rebeng/bak4.jpeg"; // 白天晴
+import img4 from "../../assets/rebeng/bak5.jpg"; // 白天晴
 import Store from "../wenkong/store.js";
 import {
   getModelVo,
@@ -202,7 +167,8 @@ export default {
       leftWater1: "0%",
       leftWater2: "0%",
       breakdownList: [],
-      currMode: '1'
+      currMode: '1',
+      value2: false
     };
   },
   computed: {
@@ -282,6 +248,10 @@ export default {
       this.$router.back(-1);
     },
     handleChangeHotWaterSlider () {
+      if (!this.isOpen) {
+        this.$toast("当前关机状态，不可操作", "bottom");
+        return false;
+      }
       let slider = document.querySelector('.hotwater-slider')
       let block = document.querySelector('.hotwater-item')
       if (slider === null || block === null) {
@@ -290,6 +260,11 @@ export default {
       this.leftHotwater = (this.hotwater / 60) * (slider.offsetWidth / block.offsetWidth) * 100
     },
     handleChangeWaterSlider () {
+      if (!this.isOpen) {
+        this.$toast("当前关机状态，不可操作", "bottom");
+        return false;
+      }
+
       let tempArray = {};
       if (this.currMode == '1') {
         tempArray = this.abilitysList.find(item => item.abilityId == this.formatItemsList[5].abilityId);
@@ -415,13 +390,13 @@ export default {
           });
           this.abilitysList = data.abilitysList;
           // 定时请求接口数据，更新页面数据
-          this.setInter = setInterval(() => {
-            this.getIndexFormatData();
-          }, 1000);
+          // this.setInter = setInterval(() => {
+          this.getIndexFormatData();
+          // }, 1000);
 
-          this.setInter2 = setInterval(() => {
-            this.getWeather();
-          }, 20000);
+          // this.setInter2 = setInterval(() => {
+          this.getWeather();
+          // }, 20000);
 
           // 显示页面
           this.pageIsShow = true;
@@ -502,6 +477,7 @@ export default {
         // 制冷、制热
         const data = this.abilitysList.find(item => item.abilityId == this.formatItemsList[9].abilityId);
         this.currMode = data.currValue;
+        // this.currMode = "8";
 
         let tempArray = {};
         if (this.currMode == '1') {
@@ -846,82 +822,115 @@ export default {
       background-size: 20px 20px;
     }
   }
-  .content {
-    padding: 20px 15px 30px 15px;
-    color: #000000;
-    background: #ffffff;
+  .mode-panel {
+    text-align: center;
+    margin-top: 45px;
     display: flex;
-    align-items: flex-start;
-    &.hotwater {
-      align-items: center;
-    }
-    .icon {
-      width: 40px;
-      height: 40px;
-      margin-right: 10px;
-      box-sizing: content-box;
-      .breakdown {
-        background: url("../../assets/rebeng/breakdown-icon.png") no-repeat
-          center center;
-        background-size: 35px 35px;
-        width: 35px;
-        height: 35px;
-      }
-      .on-off {
-        background: url("../../assets/rebeng/on-off-black.png") no-repeat center
-          center;
-        background-size: 35px 35px;
-        width: 35px;
-        height: 35px;
-        border: 1px solid #333333;
+    justify-content: space-around;
+    align-items: center;
+    .card {
+      width: 105px;
+      height: 105px;
+      background: rgba(255, 255, 255, 0.13);
+      font-size: 14px;
+      border-radius: 10px;
+      .icon {
+        width: 45px;
+        height: 45px;
+        border: 1px solid #ffffff;
         border-radius: 100%;
+        margin: 20px auto 15px auto;
+        &.cold {
+          background: url("../../assets/rebeng/zhileng.png") no-repeat center
+            center;
+          background-size: 48px 46px;
+        }
+        &.cold.active {
+          border: 1px solid #2921ff;
+          background: url("../../assets/rebeng/cold-active.png") no-repeat
+            center center;
+          background-size: 48px 46px;
+        }
+        &.hot {
+          background: url("../../assets/rebeng/gongnuan.png") no-repeat center
+            center;
+          background-size: 48px 46px;
+        }
+        &.hot.active {
+          border: 1px solid #ff8925;
+          background: url("../../assets/rebeng/hot-avtive.png") no-repeat center
+            center;
+          background-size: 48px 46px;
+        }
+        &.switch {
+          background: url("../../assets/rebeng/on-off.png") no-repeat center
+            center;
+          background-size: 48px 46px;
+        }
+        &.switch.active {
+          border: 1px solid #20e645;
+          background: url("../../assets/rebeng/on-off-open.png") no-repeat
+            center center;
+          background-size: 48px 46px;
+        }
       }
-      .desc {
-        margin-top: 5px;
-        font-size: 11px;
-        color: #333333;
+      .text {
+        &.cold.active {
+          color: #2921ff;
+        }
+        &.hot.active {
+          color: #ff8925;
+        }
+        &.switch.active {
+          color: #20e645;
+        }
+      }
+    }
+  }
+  .panel {
+    margin: 0 10px;
+    padding-bottom: 25px;
+    &:not(:first-child) {
+      border-bottom: 1px solid #eeeeee;
+    }
+    .title {
+      font-size: 22px;
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .icon {
+        position: relative;
+        &.hotwater::before {
+          content: "";
+          background: url("../../assets/rebeng/hot-water-active.png") no-repeat
+            center center;
+          background-size: 35px 28px;
+          height: 45px;
+          width: 45px;
+          display: inline-block;
+          vertical-align: -13px;
+        }
+        &.break::before {
+          content: "";
+          background: url("../../assets/rebeng/state.png") no-repeat center
+            center;
+          background-size: 35px 28px;
+          height: 45px;
+          width: 45px;
+          display: inline-block;
+          vertical-align: -13px;
+        }
+      }
+      .state {
+        font-weight: bold;
+        i {
+          margin-right: 5px;
+        }
       }
     }
     .item {
-      flex: 1;
-      width: 100%;
-      position: relative;
-      margin-bottom: 45px;
-      .title {
-        font-size: 22px;
-        position: relative;
-        height: 35px;
-        line-height: 35px;
-        margin-bottom: 20px;
-        .state {
-          float: right;
-          font-weight: bold;
-          &::before {
-            position: absolute;
-            content: "";
-            width: 30px;
-            height: 30px;
-            right: 45px;
-            top: 1px;
-          }
-          &.success {
-            color: #00be8b;
-            &::before {
-              background: url("../../assets/rebeng/gouhao.png") no-repeat center
-                center;
-              background-size: 30px 30px;
-            }
-          }
-          &.error {
-            color: #f92400;
-            &::before {
-              background: url("../../assets/rebeng/warningo.png") no-repeat
-                center center;
-              background-size: 30px 30px;
-            }
-          }
-        }
-      }
+      padding: 20px 15px 30px 15px;
       .list {
         border-top: 1px solid #dfdfdf;
         & ul li {
@@ -934,7 +943,7 @@ export default {
               width: 10px;
               height: 10px;
               border-radius: 50%;
-              background: linear-gradient(to top right, #599aff, #9a57ff);
+              background: #ffffff;
               content: "";
               margin-right: 5px;
             }
@@ -951,20 +960,35 @@ export default {
         font-size: 14px;
         font-weight: bold;
         .min {
-          color: #4ca6ff;
+          color: #2921ff;
           width: 24px;
         }
         .max {
-          color: #ff874c;
+          color: #ff3b21;
           width: 32px;
           text-align: right;
+          &.cold {
+            color: #06fbda;
+          }
         }
       }
       .card {
         display: inline-block;
         text-align: center;
+        .num {
+          font-size: 22px;
+        }
+        .desc {
+          font-size: 12px;
+        }
         &.up {
           display: block;
+          & .num.cold {
+            color: #2199ff;
+          }
+          & .num.hot {
+            color: #ff8925;
+          }
         }
         &.down {
           position: absolute;
@@ -972,116 +996,20 @@ export default {
             content: "";
             height: 17px;
             width: 2px;
-            background-color: #4ca6ff;
+            background-color: #2921ff;
             position: absolute;
             top: -20px;
           }
         }
-        .num {
-          font-size: 22px;
-          color: #333333;
-        }
-        .desc {
-          font-size: 12px;
-          color: #999999;
-        }
       }
     }
   }
-  .footer {
-    margin-top: 10px;
-    text-align: center;
-    font-size: 13px;
-    @media only screen and (min-device-width: 320px) and (max-device-width: 340px) {
-      margin-top: 10px;
-    }
-    &.fixed {
-      position: fixed;
-      bottom: 10px;
-      width: 100%;
-    }
-    .but-list {
-      display: flex;
-      &:not(:first-child) {
-        margin-top: 20px;
-      }
-      .but-group {
-        flex: 1;
-        & .icon {
-          width: 35px;
-          height: 35px;
-          border: 1px solid #ffffff;
-          border-radius: 100%;
-          margin: 0 auto;
-          margin-bottom: 5px;
-          &.on-off {
-            background: url("../../assets/rebeng/on-off.png") no-repeat center
-              center;
-            background-size: 38px 36px;
-          }
-          &.on-off-open {
-            background: url("../../assets/rebeng/on-off-open.png") no-repeat
-              center center;
-            background-size: 38px 36px;
-          }
-          &.zhileng {
-            background: url("../../assets/rebeng/zhileng.png") no-repeat center
-              center;
-            background-size: 38px 36px;
-          }
-          &.gongnuan {
-            background: url("../../assets/rebeng/gongnuan.png") no-repeat center
-              center;
-            background-size: 38px 36px;
-          }
-          &.water-temp {
-            background: url("../../assets/rebeng/water-temperature.png")
-              no-repeat center center;
-            background-size: 38px 36px;
-          }
-          &.breakdown {
-            background: url("../../assets/rebeng/breakdown.png") no-repeat
-              center center;
-            background-size: 38px 36px;
-          }
-          &.hot-water {
-            background: url("../../assets/rebeng/hot-water.png") no-repeat
-              center center;
-            background-size: 38px 36px;
-          }
-          &.menu {
-            background: url("../../assets/menu.png") no-repeat center center;
-            background-size: 18px 16px;
-          }
-        }
-      }
-    }
-  }
-}
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
 }
 </style>
 <style rel="stylesheet/scss" lang="scss">
 .water-slider,
 .hotwater-slider {
   flex: 1;
-  .el-slider__runway {
-    background: linear-gradient(
-      to right,
-      #4ca6ff,
-      #9556ff,
-      #f44cf0,
-      #ff66a1,
-      #ff7e63,
-      #ff874c
-    );
-  }
   .el-slider__bar {
     background-color: unset;
   }

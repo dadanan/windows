@@ -40,7 +40,7 @@ import { setWechatTitle } from "utils";
 import img1 from "../../assets/bak3.jpg"; // 白天阴
 import img2 from "../../assets/bak2.jpg"; // 夜晚阴
 import img3 from "../../assets/bak1.jpg"; // 夜晚晴
-import img4 from "../../assets/rebeng/bak5.jpeg"; // 白天晴
+import img4 from "../../assets/rebeng/bak5.jpg"; // 白天晴
 import Store from "../wenkong/store.js";
 import {
   getModelVo,
