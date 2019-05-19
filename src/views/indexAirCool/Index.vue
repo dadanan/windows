@@ -274,7 +274,7 @@ export default {
       sendFunc({
         deviceId: this.deviceId,
         funcId: tempArray.dirValue,
-        value: this.waterTemp
+        value: this.waterTemp * 10
       }).then(res => {
         if (res.code === 200) {
           Toast({
@@ -482,10 +482,10 @@ export default {
           }
           if (data.currValue === '2') {
             temp = this.abilitysList.find(item => item.abilityId == this.formatItemsList[2].abilityId);
-            this.waterTemp = Number(temp.currValue)
+            this.waterTemp = Number(temp.currValue) / 10
           } else if (data.currValue === '3') {
             temp = this.abilitysList.find(item => item.abilityId == this.formatItemsList[3].abilityId);
-            this.waterTemp = Number(temp.currValue)
+            this.waterTemp = Number(temp.currValue) / 10
           }
         })
       }
