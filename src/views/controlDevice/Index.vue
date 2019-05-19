@@ -16,14 +16,14 @@
     </div>
 
     <div class="panel">
-      <div class="card" @click="switchMode('1')">
-        <div class="icon cold"></div>
-        <p :class="{active: currMode==='1'}">主机制冷</p>
-      </div>
-      <div class="card" @click="switchMode('8')">
-        <div class="icon hot"></div>
-        <p :class="{active: currMode==='8'}">主机制热</p>
-      </div>
+      <template v-if="formatItemsList[1] && formatItemsList[1].showStatus">
+        <div class="card" v-for="(item, index) in getListData(formatItemsList[1].abilityId)" @click="switchMode(item.dirValue)">
+          <div class="icon" :class="{active: isOpen&&item.isChecked , hot: item.dirValue === '--' , cold: item.dirValue === '5'}"></div>
+          <p class="text" :class="{active: isOpen&&item.isChecked, hot: item.dirValue === '--' , cold: item.dirValue === '5'}">
+            {{item.optionDefinedName}}
+          </p>
+        </div>
+      </template>
     </div>
 
     <div class="switch" @click="onOffMethod">
@@ -69,11 +69,6 @@ export default {
       isOpen: true, // 开关
       modeCurrent: undefined,
       modeData: [],
-      speedFlag: false,
-      speedData: [],
-      functionFlag: false,
-      functionCurrent: null,
-      functionData: [],
       formatItemsList: [],
       abilitysList: [],
       location: "",
@@ -87,20 +82,7 @@ export default {
       setInter: undefined, // 定时id
       dirValueList: [],
       batteryList3: "",
-      setInter2: undefined,
-      breakdownFlag: false,
-      hotWaterFlag: false,
-      waterTempFlag: false,
-      waterTemp: 36,
-      hotwater: 30,
-      currHotwater: 56,
-      waterTemp1: 0,
-      waterTemp2: 0,
-      leftHotwater: "0%",
-      leftWater1: "0%",
-      leftWater2: "0%",
-      breakdownList: [],
-      currMode: '1'
+      setInter2: undefined
     };
   },
   computed: {
@@ -196,6 +178,31 @@ export default {
         }
       });
     },
+    /**
+     * 返回功能项的选项数据，
+     * 如果是风速，和功能（多选），则特殊处理
+     * @param which left 回风风速
+     * @param which right 送风风速
+     * @param which func 功能
+     */
+    getListData (abilityId, which) {
+      // 说明是风速的abilityId，那么特殊情况，特殊处理
+      if (which === "left") {
+        return this.getListData(abilityId.split(",")[0]);
+      } else if (which === "right") {
+        return this.getListData(abilityId.split(",")[1]);
+      } else if (which === "func") {
+        return abilityId.split(",").map(id => {
+          return this.getAbilityData(id);
+        });
+      }
+
+      // 根据功能id获取功能项的数据
+      const result = this.abilitysList.filter(
+        item => item.abilityId == abilityId
+      )[0];
+      return result && result.abilityOptionList;
+    },
     hasTwoAbility () {
       // 功能项数据中是否存在：主机模式(制冷制热)和主机开关，存在返回true
       const dirValueArray = ["2D8.0", "2DR.0"];
@@ -241,8 +248,7 @@ export default {
       Loading.close();
       sendFunc({
         deviceId: this.deviceId,
-        // funcId: tempArray.dirValue,
-        funcId: '2C0',
+        funcId: tempArray.dirValue,
         value: tempList[index].dirValue
       }).then(res => {
         this.isOpen = !this.isOpen;
@@ -359,8 +365,15 @@ export default {
       // 为了解决：弹框打开的情况下，设备状态变化时，弹框内选项数据却没有变更的问题。
       const updateCurrData = () => {
         // 制冷、制热
-        const data = this.abilitysList.find(item => item.abilityId == this.formatItemsList[9].abilityId);
-        this.currMode = data.currValue;
+        const data = this.abilitysList.find(item => item.abilityId == this.formatItemsList[1].abilityId);
+        const tempArray = data.abilityOptionList
+        tempArray.map(m => {
+          if (data.currValue === m.dirValue) {
+            m.isChecked = true
+          } else {
+            m.isChecked = false
+          }
+        })
       }
 
       updateCurrData();
@@ -477,17 +490,15 @@ export default {
       // 模式 1制冷 8 制热
       console.log(index)
       const tempArray = this.abilitysList.filter(
-        item => item.abilityId == this.formatItemsList[9].abilityId
+        item => item.abilityId == this.formatItemsList[1].abilityId
       )[0];
       const tempList = tempArray.abilityOptionList;
       sendFunc({
         deviceId: this.deviceId,
-        //funcId: tempArray.dirValue,
-        funcId: '210',
+        funcId: tempArray.dirValue,
         value: index
       }).then(res => {
         if (res.code === 200) {
-          this.currMode = index
           Toast({
             mes: "发送成功",
             timeout: 1000,

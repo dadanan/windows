@@ -15,43 +15,47 @@
     </div>
 
     <div class="mode-panel">
-      <div class="card" @click="switchMode('8')">
-        <div class="icon hot" :class="{active: isOpen&&currMode==='8'}"></div>
-        <p class="text hot" :class="{active: isOpen&&currMode==='8'}">制热</p>
-      </div>
-      <div class="card" @click="switchMode('1')">
-        <div class="icon cold" :class="{active: isOpen&&currMode==='1'}"></div>
-        <p class="text cold" :class="{active: isOpen&&currMode==='1'}">制冷</p>
-      </div>
-      <div class="card" @click="onOffMethod">
+      <template v-if="formatItemsList[1] && formatItemsList[1].showStatus">
+        <div class="card" v-for="(item, index) in getListData(formatItemsList[1].abilityId)" v-if="item.dirValue!=='4'" @click="switchMode(item.dirValue)">
+          <div class="icon" :class="{active: isOpen&&item.isChecked , hot: item.dirValue === '3' , cold: item.dirValue === '2'}"></div>
+          <p class="text" :class="{active: isOpen&&item.isChecked, hot: item.dirValue === '3' , cold: item.dirValue === '2'}">
+            {{item.optionDefinedName}}
+          </p>
+        </div>
+      </template>
+      <div class="card" @click="onOffMethod" v-if="formatItemsList[0] && formatItemsList[0].showStatus">
         <div class="icon switch" :class="{active: isOpen}"></div>
-        <p class="text switch" :class="{active: isOpen}">开关</p>
+        <p class="text switch" :class="{active: isOpen}">{{formatItemsList[0].showName}}</p>
       </div>
     </div>
 
     <div class="panel">
       <div class="item">
-        <div class="card up">
-          <p class="num" :class="currMode==='1' ? 'cold' : currMode==='8' ? 'hot' : ''">{{waterTemp}}°</p>
-          <p class="desc">设定回水温度</p>
+        <div class="card-panel">
+          <div class="card">
+            <p class="num" :class="currMode===coldMode ? 'cold' : currMode===hotMode ? 'hot' : ''">{{waterTemp}}°</p>
+            <p class="desc">设定回水温度</p>
+          </div>
         </div>
-        <div class="block" v-if="currMode==='8'">
+        <div class="block" v-if="currMode===hotMode">
           <span class="min">0°</span>
-          <el-slider class="water-slider" :disabled="!isOpen" v-model="waterTemp" :min="0" :max="60" :show-tooltip="false" @change="handleChangeWaterSlider"></el-slider>
+          <el-slider class="water-slider1" :disabled="!isOpen" v-model="waterTemp" :min="0" :max="60" :show-tooltip="false" @change="handleChangeWaterSlider"></el-slider>
           <span class="max">60°</span>
         </div>
         <div class="block" v-else>
           <span class="min">0°</span>
-          <el-slider class="water-slider" :disabled="!isOpen" v-model="waterTemp" :min="0" :max="25" :show-tooltip="false" @change="handleChangeWaterSlider"></el-slider>
+          <el-slider class="water-slider1" :disabled="!isOpen" v-model="waterTemp" :min="0" :max="25" :show-tooltip="false" @change="handleChangeWaterSlider"></el-slider>
           <span class="max cold">25°</span>
         </div>
-        <div class="card down" :style="{left:leftWater1+ '%'}">
-          <p class="num">{{waterTemp1}}°</p>
-          <p class="desc">供水温度</p>
-        </div>
-        <div class="card down" :style="{left:leftWater2+ '%'}">
-          <p class="num">{{waterTemp2}}°</p>
-          <p class="desc">回水温度</p>
+        <div class="card-panel">
+          <div class="card">
+            <p class="num">{{waterTempGS}}°</p>
+            <p class="desc">供水温度</p>
+          </div>
+          <div class="card">
+            <p class="num">{{waterTempHS}}°</p>
+            <p class="desc">回水温度</p>
+          </div>
         </div>
       </div>
     </div>
@@ -63,18 +67,22 @@
         </el-switch>
       </div>
       <div class="item">
-        <div class="card up">
-          <p class="num hot">{{hotwater}}°</p>
-          <p class="desc">设定当前温度</p>
+        <div class="card-panel">
+          <div class="card">
+            <p class="num hot">{{hotwater}}°</p>
+            <p class="desc">设定当前温度</p>
+          </div>
         </div>
         <div class="block">
           <span class="min">0°</span>
-          <el-slider class="hotwater-slider" :disabled="!isOpen" v-model="hotwater" :min="0" :max="60" :show-tooltip="false" @change="handleChangeHotWaterSlider"></el-slider>
+          <el-slider class="water-slider1" :disabled="!isOpen" v-model="hotwater" :min="0" :max="60" :show-tooltip="false" @change="handleChangeHotWaterSlider"></el-slider>
           <span class="max">60°</span>
         </div>
-        <div class="card down" :style="{left: leftHotwater+ '%'}">
-          <p class="num">{{hotwater}}°</p>
-          <p class="desc">当前温度</p>
+        <div class="card-panel">
+          <div class="card">
+            <p class="num">{{hotwater}}°</p>
+            <p class="desc">当前温度</p>
+          </div>
         </div>
       </div>
     </div>
@@ -155,19 +163,15 @@ export default {
       dirValueList: [],
       batteryList3: "",
       setInter2: undefined,
-      breakdownFlag: false,
-      hotWaterFlag: false,
-      waterTempFlag: false,
-      waterTemp: 36,
-      hotwater: 30,
+      waterTemp: 0,
+      hotwater: 0,
       currHotwater: 56,
-      waterTemp1: 0,
-      waterTemp2: 0,
-      leftHotwater: "0%",
-      leftWater1: "0%",
-      leftWater2: "0%",
+      waterTempGS: 0,
+      waterTempHS: 0,
       breakdownList: [],
-      currMode: '1',
+      currMode: '2',
+      hotMode: '3',
+      coldMode: '2',
       value2: false
     };
   },
@@ -252,27 +256,18 @@ export default {
         this.$toast("当前关机状态，不可操作", "bottom");
         return false;
       }
-      let slider = document.querySelector('.hotwater-slider')
-      let block = document.querySelector('.hotwater-item')
-      if (slider === null || block === null) {
-        return false
-      }
-      this.leftHotwater = (this.hotwater / 60) * (slider.offsetWidth / block.offsetWidth) * 100
     },
     handleChangeWaterSlider () {
       if (!this.isOpen) {
         this.$toast("当前关机状态，不可操作", "bottom");
         return false;
       }
-
-      let tempArray = {};
-      if (this.currMode == '1') {
-        tempArray = this.abilitysList.find(item => item.abilityId == this.formatItemsList[5].abilityId);
-      } else if (this.currMode == '8') {
-        tempArray = this.abilitysList.find(item => item.abilityId == this.formatItemsList[6].abilityId);
-      }
-
-      if (JSON.stringify(tempArray) === '{}') {
+      let tempArray = {}
+      if (this.currMode === '2') {
+        tempArray = this.abilitysList.find(item => item.abilityId == this.formatItemsList[2].abilityId);
+      } else if (this.currMode === '3') {
+        tempArray = this.abilitysList.find(item => item.abilityId == this.formatItemsList[3].abilityId);
+      } else {
         return false;
       }
 
@@ -390,13 +385,13 @@ export default {
           });
           this.abilitysList = data.abilitysList;
           // 定时请求接口数据，更新页面数据
-          // this.setInter = setInterval(() => {
-          this.getIndexFormatData();
-          // }, 1000);
+          this.setInter = setInterval(() => {
+            this.getIndexFormatData();
+          }, 1000);
 
-          // this.setInter2 = setInterval(() => {
-          this.getWeather();
-          // }, 20000);
+          this.setInter2 = setInterval(() => {
+            this.getWeather();
+          }, 20000);
 
           // 显示页面
           this.pageIsShow = true;
@@ -474,79 +469,53 @@ export default {
       // 实时设置下方弹框内的数据
       // 为了解决：弹框打开的情况下，设备状态变化时，弹框内选项数据却没有变更的问题。
       const updateCurrData = () => {
-        // 制冷、制热
-        const data = this.abilitysList.find(item => item.abilityId == this.formatItemsList[9].abilityId);
-        this.currMode = data.currValue;
-        // this.currMode = "8";
-
-        let tempArray = {};
-        if (this.currMode == '1') {
-          tempArray = this.abilitysList.find(item => item.abilityId == this.formatItemsList[5].abilityId);
-        } else if (this.currMode == '8') {
-          tempArray = this.abilitysList.find(item => item.abilityId == this.formatItemsList[6].abilityId);
-        }
-        this.waterTemp = Number(tempArray.currValue)
+        // 模式
+        const data = this.abilitysList.find(item => item.abilityId == this.formatItemsList[1].abilityId);
+        const tempArray = data.abilityOptionList
+        let temp = {}
+        tempArray.map(m => {
+          if (data.currValue === m.dirValue) {
+            this.currMode = m.dirValue
+            m.isChecked = true
+          } else {
+            m.isChecked = false
+          }
+          if (data.currValue === '2') {
+            temp = this.abilitysList.find(item => item.abilityId == this.formatItemsList[2].abilityId);
+            this.waterTemp = Number(temp.currValue)
+          } else if (data.currValue === '3') {
+            temp = this.abilitysList.find(item => item.abilityId == this.formatItemsList[3].abilityId);
+            this.waterTemp = Number(temp.currValue)
+          }
+        })
       }
 
       // 更新故障
       const updateBreakdown = () => {
         this.breakdownList = []
-        // 空调水流故障
-        const data1 = this.abilitysList.find(item => item.abilityId == this.formatItemsList[1].abilityId);
-        // 冷却水流故障
-        const data2 = this.abilitysList.find(item => item.abilityId == this.formatItemsList[2].abilityId);
-        // 出水低温告警
-        const data3 = this.abilitysList.find(item => item.abilityId == this.formatItemsList[3].abilityId);
-        // 出水高温告警
-        const data4 = this.abilitysList.find(item => item.abilityId == this.formatItemsList[4].abilityId);
-
-        const tempArray1 = data1.abilityOptionList;
-        const tempArray2 = data2.abilityOptionList;
-        const tempArray3 = data3.abilityOptionList;
-        const tempArray4 = data4.abilityOptionList;
-        // 根据isSelect的值，对相应选项执行默认选中行为
-        // 找到空调水流故障的对象
-        const tempObj1 = tempArray1[0].dirValue == 0 ? tempArray1[0] : tempArray1[1];
-        const tempObj2 = tempArray2[0].dirValue == 0 ? tempArray2[0] : tempArray2[1];
-        const tempObj3 = tempArray3[0].dirValue == 0 ? tempArray3[0] : tempArray3[1];
-        const tempObj4 = tempArray4[0].dirValue == 0 ? tempArray4[0] : tempArray4[1];
-        if (tempObj1.isSelect === 0) {
-          // 故障
-          this.breakdownList.push({
-            code: data1.dirValue,
-            desc: data1.abilityName
+        const ids = this.formatItemsList[6] && this.formatItemsList[6].abilityId.split(",");
+        ids.map(id => {
+          let tempdata = this.abilitysList.find(item => item.abilityId == id);
+          let tempArr = tempdata.abilityOptionList
+          tempArr.map(arr => {
+            // 故障
+            if (arr.optionValue === '1' && arr.isSelect === '1') {
+              this.breakdownList.push({
+                code: tempdata.dirValue,
+                desc: tempdata.abilityName
+              })
+            }
           })
-        }
-        if (tempObj2.isSelect === 0) {
-          // 故障
-          this.breakdownList.push({
-            code: data2.dirValue,
-            desc: data2.abilityName
-          })
-        }
-        if (tempObj3.isSelect === 0) {
-          // 故障
-          this.breakdownList.push({
-            code: data3.dirValue,
-            desc: data3.abilityName
-          })
-        }
-        if (tempObj4.isSelect === 0) {
-          // 故障
-          this.breakdownList.push({
-            code: data4.dirValue,
-            desc: data4.abilityName
-          })
-        }
+        })
       };
 
       const updateTemp = () => {
         // 供水温度
-        const data1 = this.abilitysList.find(item => item.abilityId == this.formatItemsList[7].abilityId);
+        const data1 = this.abilitysList.find(item => item.abilityId == this.formatItemsList[4].abilityId);
         // 回水温度
-        const data2 = this.abilitysList.find(item => item.abilityId == this.formatItemsList[8].abilityId);
-        this.waterTemp1 = data1.currValue / 10;
-        this.waterTemp2 = data2.currValue / 10;
+        const data2 = this.abilitysList.find(item => item.abilityId == this.formatItemsList[5].abilityId);
+        this.waterTempGS = data1.currValue / 10;
+        this.waterTempHS = data2.currValue / 10;
       };
 
       updateCurrData();
@@ -657,39 +626,30 @@ export default {
         this.cloudyNight = bgImgs[4];
       }
     },
-    showBreakdown (id) {
-      if (!this.isOpen) {
-        this.$toast("当前关机状态，不可操作", "bottom");
-        return false;
+    /**
+     * 返回功能项的选项数据，
+     * 如果是风速，和功能（多选），则特殊处理
+     * @param which left 回风风速
+     * @param which right 送风风速
+     * @param which func 功能
+     */
+    getListData (abilityId, which) {
+      // 说明是风速的abilityId，那么特殊情况，特殊处理
+      if (which === "left") {
+        return this.getListData(abilityId.split(",")[0]);
+      } else if (which === "right") {
+        return this.getListData(abilityId.split(",")[1]);
+      } else if (which === "func") {
+        return abilityId.split(",").map(id => {
+          return this.getAbilityData(id);
+        });
       }
-      this.breakdownFlag = true;
-    },
-    showWater () {
-      if (!this.isOpen) {
-        this.$toast("当前关机状态，不可操作", "bottom");
-        return false;
-      }
-      this.waterTempFlag = true
-      this.$nextTick(() => {
-        // 设置供水、回水温度在 slider 上的位置
-        let slider = document.querySelector('.water-slider')
-        let block = document.querySelector('.water-item')
-        if (slider === null || block === null) {
-          return false
-        }
-        this.leftWater1 = (this.waterTemp1 / 60) * (slider.offsetWidth / block.offsetWidth) * 100
-        this.leftWater2 = (this.waterTemp2 / 60) * (slider.offsetWidth / block.offsetWidth) * 100
-      })
-    },
-    showHotWater () {
-      if (!this.isOpen) {
-        this.$toast("当前关机状态，不可操作", "bottom");
-        return false;
-      }
-      this.hotWaterFlag = true
-      this.$nextTick(() => {
-        this.handleChangeHotWaterSlider()
-      })
+
+      // 根据功能id获取功能项的数据
+      const result = this.abilitysList.filter(
+        item => item.abilityId == abilityId
+      )[0];
+      return result && result.abilityOptionList;
     },
     switchMode (index) {
       if (!this.isOpen) {
@@ -699,7 +659,7 @@ export default {
       // 模式 1制冷 8 制热
       console.log(index)
       const tempArray = this.abilitysList.filter(
-        item => item.abilityId == this.formatItemsList[9].abilityId
+        item => item.abilityId == this.formatItemsList[1].abilityId
       )[0];
       const tempList = tempArray.abilityOptionList;
       sendFunc({
@@ -887,12 +847,12 @@ export default {
       }
     }
   }
+  .panel + .panel {
+    border-top: 1px solid #eeeeee;
+  }
   .panel {
     margin: 0 10px;
     padding-bottom: 25px;
-    &:not(:first-child) {
-      border-bottom: 1px solid #eeeeee;
-    }
     .title {
       font-size: 22px;
       position: relative;
@@ -972,34 +932,24 @@ export default {
           }
         }
       }
+      .card-panel {
+        display: flex;
+        justify-content: space-around;
+      }
       .card {
         display: inline-block;
         text-align: center;
         .num {
           font-size: 22px;
+          &.hot {
+            color: #ff874c;
+          }
+          &.cold {
+            color: #2199ff;
+          }
         }
         .desc {
           font-size: 12px;
-        }
-        &.up {
-          display: block;
-          & .num.cold {
-            color: #2199ff;
-          }
-          & .num.hot {
-            color: #ff8925;
-          }
-        }
-        &.down {
-          position: absolute;
-          &::before {
-            content: "";
-            height: 17px;
-            width: 2px;
-            background-color: #2921ff;
-            position: absolute;
-            top: -20px;
-          }
         }
       }
     }
@@ -1007,8 +957,7 @@ export default {
 }
 </style>
 <style rel="stylesheet/scss" lang="scss">
-.water-slider,
-.hotwater-slider {
+.water-slider1 {
   flex: 1;
   .el-slider__bar {
     background-color: unset;

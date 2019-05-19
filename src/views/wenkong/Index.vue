@@ -182,7 +182,7 @@ import img4 from "../../assets/bak4.jpg"; // 白天晴
 import store from './store';
 
 export default {
-  data() {
+  data () {
     return {
       shutdown: "", // 关机
       cloudyDay: img1, // 阴天
@@ -245,7 +245,7 @@ export default {
     };
   },
   computed: {
-    speedName() {
+    speedName () {
       const name = "送风风速";
       if (!this.formatItemsList[2] || !this.formatItemsList[2].abilityId) {
         return name;
@@ -260,11 +260,13 @@ export default {
      * 设置功能项指令
      * 返回功能项选项数据
      */
-    getFunctionList() {
+    getFunctionList () {
       if (!this.formatItemsList[3] || !this.formatItemsList[3].abilityId) {
         return [];
       }
-      const data = this.getAbilityData(this.formatItemsList[3].abilityId);
+      const ids = this.formatItemsList[3].abilityId.split(",");
+      const id = this.isOptionalFunctionOpen ? ids[0] : ids[1];
+      const data = this.getAbilityData(id);
       if (!data) {
         return [];
       }
@@ -278,7 +280,7 @@ export default {
      * 温控器的主机，目前正在开机状态
      * 如果用户选择了‘主机状态功能项’，获取它的主机的‘主机状态功能项’的值
      */
-    hostIsOpen() {
+    hostIsOpen () {
       if (
         !this.formatItemsList[7] ||
         !this.formatItemsList[7].showStatus ||
@@ -292,12 +294,12 @@ export default {
     /**
      * 用户配置了打开了次级模式并且配置了数据?
      */
-    hasOptionalFunction() {
-      const id = this.formatItemsList[3] && this.formatItemsList[3].abilityId;
-      if (!id) {
+    hasOptionalFunction () {
+      if (!(this.formatItemsList[3] && this.formatItemsList[3].abilityId)) {
         return false;
       }
-
+      const ids = this.formatItemsList[3].abilityId.split(",");
+      const id = this.isOptionalFunctionOpen ? ids[0] : ids[1];
       const ability = this.getAbilityData(id);
       if (!ability) {
         return false;
@@ -310,7 +312,7 @@ export default {
 
       return true;
     },
-    modeClicked(index) {
+    modeClicked (index) {
       const data = this.getAbilityData(this.formatItemsList[1].abilityId);
       if (!data) {
         return;
@@ -328,10 +330,10 @@ export default {
         // 如果当前模式是致热模式，打开次级功能模式
         if ([41, 42, 43, 44].includes(Number(value))) {
           this.isOptionalFunctionOpen = true;
-        } else [(this.isOptionalFunctionOpen = false)];
+        } else[(this.isOptionalFunctionOpen = false)];
       });
     },
-    sliderChanged(val) {
+    sliderChanged (val) {
       const index = val / this.leftStep();
       const data = this.getAbilityData(this.formatItemsList[2].abilityId);
       if (!data) {
@@ -360,7 +362,7 @@ export default {
         );
       });
     },
-    leftStep() {
+    leftStep () {
       if (!this.formatItemsList[2] || !this.formatItemsList[2].abilityId) {
         return 25;
       }
@@ -368,7 +370,7 @@ export default {
         100 / (this.getListData(this.formatItemsList[2].abilityId).length - 1)
       );
     },
-    setTemperature() {
+    setTemperature () {
       // 保证每次进入页面只初始化一次。不随newQuery接口定时刷新
       if (this.hasSet) {
         return;
@@ -398,7 +400,7 @@ export default {
       });
       this.hasSet = true;
     },
-    switchHandler() {
+    switchHandler () {
       // 开关机初始化
       const tempArray = this.abilitysList.filter(
         item => item.abilityId == this.formatItemsList[8].abilityId
@@ -434,7 +436,7 @@ export default {
         }
       }
     },
-    onOffMethod() {
+    onOffMethod () {
       // 开关机
 
       const tempArray = this.abilitysList.filter(
@@ -463,16 +465,16 @@ export default {
         );
       });
     },
-    getAbilityData(abilityId) {
+    getAbilityData (abilityId) {
       const result = this.abilitysList.filter(
         item => item.abilityId == abilityId
       )[0];
       return result;
     },
-    goBack() {
+    goBack () {
       history.back();
     },
-    modelClickedHandler(id, index) {
+    modelClickedHandler (id, index) {
       if (!this.isOpen) {
         this.$toast("当前关机状态，不可操作", "bottom");
         return;
@@ -486,31 +488,31 @@ export default {
 
       index == 1 ? (this.modelVisible = true) : (this.windVisible = true);
     },
-    increaseTem() {
+    increaseTem () {
       this.temNumber += 1;
     },
-    reduceTem() {
+    reduceTem () {
       if (this.temNumber <= 0) {
         return;
       }
       this.temNumber -= 1;
     },
 
-    increaseHum() {
+    increaseHum () {
       this.humNumber += 1;
     },
-    reduceHum() {
+    reduceHum () {
       if (this.humNumber <= 0) {
         return;
       }
       this.humNumber -= 1;
     },
-    confirmSetting() {
+    confirmSetting () {
       this.sendFunc("2DD.0", this.temNumber);
       this.sendFunc("2DE.0", this.humNumber);
       this.temperatureVisible = false;
     },
-    intoSet() {
+    intoSet () {
       if (!this.isOpen) {
         return;
       }
@@ -525,7 +527,7 @@ export default {
         }
       });
     },
-    hasTwoAbility() {
+    hasTwoAbility () {
       // 功能项数据中是否存在：主机模式(制冷制热)和主机开关，存在返回true
       const dirValueArray = ["2D8.0", "2DR.0"];
       const filter = this.abilitysList.filter(ability =>
@@ -538,7 +540,7 @@ export default {
       }
       return 0;
     },
-    modelClicked(index, data, which) {
+    modelClicked (index, data, which) {
       if (which == 3) {
         this.currentOptionForWind = index;
       } else {
@@ -546,7 +548,7 @@ export default {
       }
       this.sendFunc(data.dirValue, data.abilityOptionList[index].dirValue);
     },
-    sendFunc(funcId, value, cb) {
+    sendFunc (funcId, value, cb) {
       // 发送指令
       sendFunc({
         deviceId: this.deviceId,
@@ -564,7 +566,7 @@ export default {
         console.info("指令发送成功:", funcId, "-", value);
       });
     },
-    functionClicked(item) {
+    functionClicked (item) {
       if (!this.isOpen) {
         this.$toast("当前关机状态，不可操作", "bottom");
         return;
@@ -577,12 +579,12 @@ export default {
         });
       });
     },
-    getIndexAbilityData() {
+    getIndexAbilityData () {
       // 获取H5控制页面功能项数据，带isSelect参数
       getModelVo({ deviceId: this.deviceId, pageNo: 1 }).then(res => {
         if (res.code == 200 && res.data) {
           const data = res.data;
-          Store.save("modelId",data.modelId)
+          Store.save("modelId", data.modelId)
           this.formatItemsList = data.formatItemsList;
 
           data.abilitysList.forEach(item => {
@@ -600,7 +602,7 @@ export default {
         }
       });
     },
-    getIndexFormatData(list) {
+    getIndexFormatData (list) {
       // 获取H5控制页面功能项数据，带isSelect参数
 
       // 根据功能项id筛选功能项
@@ -658,7 +660,7 @@ export default {
         this.setPopDialogData();
       });
     },
-    setPopDialogData() {
+    setPopDialogData () {
       // 实时设置下方模式、风速，功能等弹框内的数据
       // 为了解决：弹框打开的情况下，设备状态变化时，弹框内选项数据却没有变更的问题。
 
@@ -720,7 +722,7 @@ export default {
 
       // 次级模式的初始化
       const updateAbility = () => {
-        const data = this.getListData(this.formatItemsList[3].abilityId);
+        const data = this.getListData(this.formatItemsList[3].abilityId, 'func');
         data.forEach((item, index) => {
           if (item.isSelect == 1) {
             this.currFunction = index;
@@ -757,7 +759,7 @@ export default {
         updateAbility();
       }
     },
-    setIconVisible(keys) {
+    setIconVisible (keys) {
       this.functionIcon = {
         isFloorHot: false,
         isAirConditioning: false,
@@ -770,20 +772,37 @@ export default {
         this.functionIcon[key] = true;
       });
     },
-    getListData(abilityId) {
+    /**
+     * 返回功能项的选项数据，
+     * 如果是风速，和功能（多选），则特殊处理
+     * @param which left 回风风速
+     * @param which right 送风风速
+     * @param which func 功能
+     */
+    getListData (abilityId, which) {
+      // 说明是风速的abilityId，那么特殊情况，特殊处理
+      if (which === "left") {
+        return this.getListData(abilityId.split(",")[0]);
+      } else if (which === "right") {
+        return this.getListData(abilityId.split(",")[1]);
+      } else if (which === "func") {
+        return abilityId.split(",").map(id => {
+          return this.getAbilityData(id);
+        });
+      }
+
       // 根据功能id获取功能项的数据
       const result = this.abilitysList.filter(
         item => item.abilityId == abilityId
       )[0];
-
       return result && result.abilityOptionList;
     },
-    getLocation() {
+    getLocation () {
       getLocation(this.deviceId).then(res => {
         this.location = res.data.location;
       });
     },
-    getWeather() {
+    getWeather () {
       getWeather(this.masterDeviceId).then(res => {
         const data = res.data;
 
@@ -795,7 +814,7 @@ export default {
         this.setWeather();
       });
     },
-    setWeather() {
+    setWeather () {
       // 当前天气模式
       if (!this.isOpen) {
         this.img = this.shutdown;
@@ -862,7 +881,7 @@ export default {
      * 初始化背景图片
      * 如果客户设置的话，就用客户的；否则使用默认的
      */
-    initBackground() {
+    initBackground () {
       const bgImgs = JSON.parse(Store.fetch("bgImgs"));
       // 依次排列：关机，白天-晴天，白天-阴天，夜晚-晴天，夜晚-阴天
       if (bgImgs[0]) {
@@ -881,7 +900,7 @@ export default {
         this.cloudyNight = bgImgs[4];
       }
     },
-    intiTime() {
+    intiTime () {
       if (!this.isOpen) {
         this.$toast("当前关机状态，不可操作", "bottom");
         return;
@@ -897,7 +916,7 @@ export default {
     }
   },
   watch: {
-    isOpen(val) {
+    isOpen (val) {
       if (val) {
         this.setWeather();
       } else {
@@ -907,7 +926,7 @@ export default {
       }
     }
   },
-  created() {
+  created () {
     this.deviceName = Store.fetch("deviceName");
     this.customerName = Store.fetch("customerName");
     setWechatTitle(this.customerName, "");
@@ -918,7 +937,7 @@ export default {
     this.initBackground();
     this.hasSet = false;
   },
-  destroyed() {
+  destroyed () {
     clearInterval(this.setInter);
   },
   components: {

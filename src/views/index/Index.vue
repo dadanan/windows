@@ -184,7 +184,7 @@ let prevValues = '' //当一次用户选择的picker组件的第二个值，来�
 let currValues = '' // 当前用户所在的左侧滑杆的值
 
 export default {
-  data() {
+  data () {
     return {
       value7: 20,
       shutdown: "", // 关机
@@ -235,7 +235,7 @@ export default {
     };
   },
   computed: {
-    getOuterPM() {
+    getOuterPM () {
       // 对应配置项被用作室内PM2.5，所以室外PM2.5直接返回第三方数据
       return this.outerPm;
       // 获取室外PM2.5数据，优先使用室外传感器数据
@@ -247,7 +247,7 @@ export default {
       if (!currData) {
         return this.outerPm;
       }
-      
+
       const currValue = currData.currValue;
 
       if (currValue && currValue !== "0") {
@@ -255,7 +255,7 @@ export default {
       }
       return this.outerPm;
     },
-    getOuterHum() {
+    getOuterHum () {
       // 室外湿度
       if (!this.formatItemsList[14] || !this.formatItemsList[14].abilityId) {
         if (!this.outerHum) {
@@ -280,7 +280,7 @@ export default {
       }
       return this.outerHum.replace("%", "");
     },
-    getOuterTem() {
+    getOuterTem () {
       // 室外温度
       if (!this.formatItemsList[13] || !this.formatItemsList[13].abilityId) {
         if (!this.outerTem) {
@@ -305,7 +305,7 @@ export default {
       }
       return this.outerTem.replace("℃", "");
     },
-    leftSpeedName() {
+    leftSpeedName () {
       const name = "送风风速";
       if (!this.formatItemsList[2] || !this.formatItemsList[2].abilityId) {
         return name;
@@ -319,7 +319,7 @@ export default {
       }
       return leftData.definedName || leftData.abilityName;
     },
-    rightSpeedName() {
+    rightSpeedName () {
       const name = "回风风速";
       if (!this.formatItemsList[2] || !this.formatItemsList[2].abilityId) {
         return name;
@@ -338,14 +338,14 @@ export default {
     /**
      * 开启回风风机？
      */
-    hasRightWind() {
+    hasRightWind () {
       const ids = this.formatItemsList[2].abilityId.split(",");
       return ids.length === 2;
     },
     /**
      * 循环阈处于打开状态？
      */
-    isCycleSwitchOpen() {
+    isCycleSwitchOpen () {
       // 如果当前指令是外风机的，判断是否循环阀是否打开，没有的话。禁止发送指令
       const modelData = this.getListData(
         this.formatItemsList[3].abilityId,
@@ -361,14 +361,14 @@ export default {
       )[0];
       return cycleSwitch && cycleSwitch.isChecked;
     },
-    leftStep() {
+    leftStep () {
       const step =
         100 /
         (this.getListData(this.formatItemsList[2].abilityId, "left").length -
           1);
       return step;
     },
-    rightStep() {
+    rightStep () {
       if (!this.hasRightWind()) {
         return 0;
       }
@@ -378,7 +378,7 @@ export default {
           1);
       return step;
     },
-    sliderChangedLeft(val) {
+    sliderChangedLeft (val) {
       const index = val / this.leftStep();
       const data = this.getAbilityData(
         this.formatItemsList[2].abilityId,
@@ -410,7 +410,7 @@ export default {
         );
       });
     },
-    sliderChangedRight(val) {
+    sliderChangedRight (val) {
       if (!this.isCycleSwitchOpen()) {
         Toast({
           mes: "循环阀未打开，禁止操作此风机！",
@@ -449,7 +449,7 @@ export default {
         );
       });
     },
-    changeSleepStatus() {
+    changeSleepStatus () {
       this.isSleep = false;
       sendFunc({
         deviceId: this.deviceId,
@@ -464,7 +464,7 @@ export default {
         console.info("指令发送成功:", "210", "-", "3");
       });
     },
-    getAbilityByDirValue(dirValue) {
+    getAbilityByDirValue (dirValue) {
       // 根据指令值找对应的功能项数据，双风机风速用到
       return this.abilitysList.filter(item => item.dirValue === dirValue)[0];
     },
@@ -475,7 +475,7 @@ export default {
      * @param which right 送风风速
      * @param which func 功能
      */
-    getListData(abilityId, which) {
+    getListData (abilityId, which) {
       // 说明是风速的abilityId，那么特殊情况，特殊处理
       if (which === "left") {
         return this.getListData(abilityId.split(",")[0]);
@@ -497,7 +497,7 @@ export default {
      * 找到对应的功能项数据
      * @param which left/right 表示内风机/外风机
      */
-    getAbilityData(abilityId, which) {
+    getAbilityData (abilityId, which) {
       if (which === "left") {
         return this.abilitysList.filter(item => item.dirValue === "280")[0];
       }
@@ -509,7 +509,7 @@ export default {
       )[0];
       return result;
     },
-    intiTime() {
+    intiTime () {
       if (!this.isOpen) {
         this.$toast("当前关机状态，不可操作", "bottom");
         return false;
@@ -523,7 +523,7 @@ export default {
         }
       });
     },
-    setPopDialogData() {
+    setPopDialogData () {
       // 实时设置下方模式、风速，功能等弹框内的数据
       // 为了解决：弹框打开的情况下，设备状态变化时，弹框内选项数据却没有变更的问题。
 
@@ -627,21 +627,21 @@ export default {
         updateAbility();
       }
     },
-    switchModel(id) {
+    switchModel (id) {
       if (!this.isOpen) {
         this.$toast("当前关机状态，不可操作", "bottom");
         return false;
       }
       this.modeFlag = true;
     },
-    switchSpeed(id) {
+    switchSpeed (id) {
       if (!this.isOpen) {
         this.$toast("当前关机状态，不可操作", "bottom");
         return false;
       }
       this.speedFlag = true;
     },
-    switchFunction() {
+    switchFunction () {
       if (!this.isOpen) {
         this.$toast("当前关机状态，不可操作", "bottom");
         return false;
@@ -649,7 +649,7 @@ export default {
 
       this.functionFlag = true;
     },
-    intoSet() {
+    intoSet () {
       if (!this.isOpen) {
         return;
       }
@@ -666,7 +666,7 @@ export default {
         }
       });
     },
-    hasTwoAbility() {
+    hasTwoAbility () {
       // 功能项数据中是否存在：主机模式(制冷制热)和主机开关，存在返回true
       const dirValueArray = ["2D8.0", "2DR.0"];
       const filter = this.abilitysList.filter(ability =>
@@ -679,7 +679,7 @@ export default {
       }
       return 0;
     },
-    childMethod(type) {
+    childMethod (type) {
       if (!this.isOpen && !type) {
         this.$toast("当前关机状态，不可操作", "bottom");
         return false;
@@ -717,7 +717,7 @@ export default {
         );
       });
     },
-    onOffMethod() {
+    onOffMethod () {
       // 开关机
       const tempArray = this.abilitysList.filter(
         item => item.abilityId == this.formatItemsList[11].abilityId
@@ -747,7 +747,7 @@ export default {
         );
       });
     },
-    offopen(DirValue, Dirindex) {
+    offopen (DirValue, Dirindex) {
       sendFunc({
         deviceId: this.deviceId,
         funcId: DirValue,
@@ -756,14 +756,14 @@ export default {
         console.info("指令发送成功:", "-", Dirindex);
       });
     },
-    nodeClicked(item, index, type) {
+    nodeClicked (item, index, type) {
       // 如果是功能，index表示将要发送的指令value： 0/1 不选中/选中
       if (type === 3) {
         index = item.isChecked ? 0 : 1;
       }
       this.sendFunc(item, index, type);
     },
-    sendFunc(item, index, type, cb) {
+    sendFunc (item, index, type, cb) {
       // 模式、风速、功能的指令发送函数
       // Loading.open('发送中...')
       sendFunc({
@@ -798,12 +798,12 @@ export default {
           Loading.close();
         });
     },
-    getIndexAbilityData() {
+    getIndexAbilityData () {
       // 获取H5控制页面功能项数据，带isSelect参数
       getModelVo({ deviceId: this.deviceId, pageNo: 1 }).then(res => {
         if (res.code === 200 && res.data) {
           const data = res.data;
-          Store.save("modelId",data.modelId)
+          Store.save("modelId", data.modelId)
           this.pageName = data.pageName;
           // 将功能集里的内外风机的数据加到版式集合中。为了后面持续刷新两个风机的数据
           let windData = [];
@@ -853,7 +853,7 @@ export default {
         }
       });
     },
-    getStrainerData() {
+    getStrainerData () {
       for (var i = 0; i < this.batteryList1.length; i++) {
         this.dirValueList.push(this.batteryList1[i].optionValue);
       }
@@ -872,7 +872,7 @@ export default {
           console.log(error);
         });
     },
-    getIndexFormatData() {
+    getIndexFormatData () {
       // 获取H5控制页面功能项数据，带isSelect参数
 
       // 根据功能项id筛选功能项
@@ -929,7 +929,7 @@ export default {
         }
       });
     },
-    setWeather() {
+    setWeather () {
       // 当前天气模式
       if (!this.isOpen) {
         this.img = this.shutdown;
@@ -982,7 +982,7 @@ export default {
 
       this.img = currentBak;
     },
-    getLocation() {
+    getLocation () {
       getLocation(this.deviceId).then(res => {
         const data = res.data;
 
@@ -998,7 +998,7 @@ export default {
         }
       });
     },
-    getWeather() {
+    getWeather () {
       getWeather(this.deviceId).then(res => {
         const data = res.data;
 
@@ -1010,7 +1010,7 @@ export default {
         this.setWeather();
       });
     },
-    switchHandler() {
+    switchHandler () {
       // 开关机初始化
       const tempArray = this.abilitysList.filter(
         item => item.abilityId == this.formatItemsList[11].abilityId
@@ -1026,23 +1026,28 @@ export default {
       }
 
       // 童锁初始化
-      const tempArray2 = this.abilitysList.filter(
-        item => item.abilityId == this.formatItemsList[10].abilityId
-      )[0].abilityOptionList;
+      try {
+        const tempArray2 = this.abilitysList.filter(
+          item => item.abilityId == this.formatItemsList[10].abilityId
+        )[0].abilityOptionList;
 
-      const tempObj2 =
-        tempArray2[0].dirValue == 0 ? tempArray2[0] : tempArray2[1];
-      if (tempObj2.isSelect === 1) {
-        this.isLock = false;
-      } else {
-        this.isLock = true;
+        const tempObj2 =
+          tempArray2[0].dirValue == 0 ? tempArray2[0] : tempArray2[1];
+        if (tempObj2.isSelect === 1) {
+          this.isLock = false;
+        } else {
+          this.isLock = true;
+        }
+      } catch (error) {
+
       }
+
     },
     /**
      * 初始化背景图片
      * 如果客户设置的话，就用客户的；否则使用默认的
      */
-    initBackground() {
+    initBackground () {
       const bgImgs = JSON.parse(Store.fetch("bgImgs"));
       // 依次排列：关机，白天-晴天，白天-阴天，夜晚-晴天，夜晚-阴天
       if (bgImgs[0]) {
@@ -1062,7 +1067,7 @@ export default {
       }
     }
   },
-  created() {
+  created () {
     this.cHeight = window.innerWidth * 0.45;
     if (window.innerWidth <= 340) {
       this.cHeight = window.innerWidth * 0.45;
@@ -1076,11 +1081,11 @@ export default {
     this.getWeather();
     this.initBackground();
   },
-  mounted() {
+  mounted () {
     this.thePicker = this.$refs.picker
   },
   watch: {
-    isOpen(val) {
+    isOpen (val) {
       if (val) {
         this.setWeather();
       } else {
@@ -1088,7 +1093,7 @@ export default {
         this.img = this.shutdown || "";
       }
     },
-    isSleep(val) {
+    isSleep (val) {
       // 如果睡眠模式打开，隐藏掉模式弹框
       if (val) {
         this.modeFlag = false;
@@ -1098,7 +1103,7 @@ export default {
   components: {
     "yd-popup": Popup
   },
-  destroyed() {
+  destroyed () {
     clearInterval(this.setInter);
     clearInterval(this.setInter2);
   }

@@ -16,12 +16,16 @@
 
     <!-- 底部按钮 -->
     <div class="footer fixed">
-      <div class="but-list">
-        <div class="but-group" @click="functionFlag = !functionFlag">
-          <div class="icon menu"></div>
-          <!-- 功能 -->
-          <div class="text">功能</div>
+      <div class="but-list switch">
+        <div class="but-group" @click="onOffMethod">
+          <div class="icon" :class="isOpen ? 'on-off-open' : 'on-off'"></div>
+          <div class="text">开关机</div>
         </div>
+        <div class="but-group"></div>
+        <div class="but-group"></div>
+        <div class="but-group"></div>
+      </div>
+      <div class="but-list">
         <div class="but-group" @click="showWater">
           <div class="icon water-temp"></div>
           <!-- 水温 -->
@@ -37,25 +41,15 @@
           <!-- 热水 -->
           <div class="text">热水</div>
         </div>
-      </div>
-
-      <transition name="fade">
-        <!-- 功能面板 -->
-        <div class="but-list" v-show="functionFlag">
-          <div class="but-group" @click="onOffMethod">
-            <div class="icon" :class="isOpen ? 'on-off-open' : 'on-off'"></div>
-            <div class="text">开关机</div>
-          </div>
-          <div class="but-group" @click="switchMode('1')">
-            <div class="icon zhileng"></div>
-            <div class="text">制冷</div>
-          </div>
-          <div class="but-group" @click="switchMode('8')">
-            <div class="icon gongnuan"></div>
-            <div class="text">供暖</div>
-          </div>
+        <div class="but-group" @click="switchMode('1')" v-if="currMode ==='8'">
+          <div class="icon zhileng"></div>
+          <div class="text">制冷</div>
         </div>
-      </transition>
+        <div class="but-group" @click="switchMode('8')" v-if="currMode ==='1'">
+          <div class="icon gongnuan"></div>
+          <div class="text">供暖</div>
+        </div>
+      </div>
     </div>
 
     <!-- 故障 -->
@@ -90,19 +84,23 @@
           <div class="on-off"></div>
           <p class="desc">开关机</p>
         </div>
-        <div class="item hotwater-item">
-          <div class="card up">
-            <p class="num">{{hotwater}}°</p>
-            <p class="desc">设定当前温度</p>
+        <div class="item">
+          <div class="card-panel">
+            <div class="card">
+              <p class="num">{{hotwater}}°</p>
+              <p class="desc">设定当前温度</p>
+            </div>
           </div>
           <div class="block">
             <span class="min">0°</span>
-            <el-slider class="hotwater-slider" v-model="hotwater" :min="0" :max="60" :show-tooltip="false" @change="handleChangeHotWaterSlider"></el-slider>
+            <el-slider class="water-slider" v-model="hotwater" :min="0" :max="60" :show-tooltip="false" @change="handleChangeHotWaterSlider"></el-slider>
             <span class="max">60°</span>
           </div>
-          <div class="card down" :style="{left: leftHotwater+ '%'}">
-            <p class="num">{{hotwater}}°</p>
-            <p class="desc">当前温度</p>
+          <div class="card-panel">
+            <div class="card">
+              <p class="num">{{hotwater}}°</p>
+              <p class="desc">当前温度</p>
+            </div>
           </div>
         </div>
       </div>
@@ -111,23 +109,27 @@
     <!-- 水温 -->
     <yd-popup v-model="waterTempFlag" position="bottom" width="90%">
       <div class="content">
-        <div class="item water-item">
-          <div class="card up">
-            <p class="num">{{waterTemp}}°</p>
-            <p class="desc">设定回水温度</p>
+        <div class="item">
+          <div class="card-panel">
+            <div class="card">
+              <p class="num">{{waterTemp}}°</p>
+              <p class="desc">设定回水温度</p>
+            </div>
           </div>
           <div class="block">
             <span class="min">0°</span>
             <el-slider class="water-slider" v-model="waterTemp" :min="0" :max="60" :show-tooltip="false" @change="handleChangeWaterSlider"></el-slider>
             <span class="max">60°</span>
           </div>
-          <div class="card down" :style="{left:leftWater1+ '%'}">
-            <p class="num">{{waterTemp1}}°</p>
-            <p class="desc">供水温度</p>
-          </div>
-          <div class="card down" :style="{left:leftWater2+ '%'}">
-            <p class="num">{{waterTemp2}}°</p>
-            <p class="desc">回水温度</p>
+          <div class="card-panel">
+            <div class="card">
+              <p class="num">{{waterTemp1}}°</p>
+              <p class="desc">供水温度</p>
+            </div>
+            <div class="card">
+              <p class="num">{{waterTemp2}}°</p>
+              <p class="desc">回水温度</p>
+            </div>
           </div>
         </div>
       </div>
@@ -173,7 +175,6 @@ export default {
       modeData: [],
       speedFlag: false,
       speedData: [],
-      functionFlag: false,
       functionCurrent: null,
       functionData: [],
       formatItemsList: [],
@@ -198,9 +199,6 @@ export default {
       currHotwater: 56,
       waterTemp1: 0,
       waterTemp2: 0,
-      leftHotwater: "0%",
-      leftWater1: "0%",
-      leftWater2: "0%",
       breakdownList: [],
       currMode: '1'
     };
@@ -282,12 +280,6 @@ export default {
       this.$router.back(-1);
     },
     handleChangeHotWaterSlider () {
-      let slider = document.querySelector('.hotwater-slider')
-      let block = document.querySelector('.hotwater-item')
-      if (slider === null || block === null) {
-        return false
-      }
-      this.leftHotwater = (this.hotwater / 60) * (slider.offsetWidth / block.offsetWidth) * 100
     },
     handleChangeWaterSlider () {
       let tempArray = {};
@@ -694,16 +686,6 @@ export default {
         return false;
       }
       this.waterTempFlag = true
-      this.$nextTick(() => {
-        // 设置供水、回水温度在 slider 上的位置
-        let slider = document.querySelector('.water-slider')
-        let block = document.querySelector('.water-item')
-        if (slider === null || block === null) {
-          return false
-        }
-        this.leftWater1 = (this.waterTemp1 / 60) * (slider.offsetWidth / block.offsetWidth) * 100
-        this.leftWater2 = (this.waterTemp2 / 60) * (slider.offsetWidth / block.offsetWidth) * 100
-      })
     },
     showHotWater () {
       if (!this.isOpen) {
@@ -960,23 +942,13 @@ export default {
           text-align: right;
         }
       }
+      .card-panel {
+        display: flex;
+        justify-content: space-around;
+      }
       .card {
         display: inline-block;
         text-align: center;
-        &.up {
-          display: block;
-        }
-        &.down {
-          position: absolute;
-          &::before {
-            content: "";
-            height: 17px;
-            width: 2px;
-            background-color: #4ca6ff;
-            position: absolute;
-            top: -20px;
-          }
-        }
         .num {
           font-size: 22px;
           color: #333333;
@@ -1005,6 +977,8 @@ export default {
       &:not(:first-child) {
         margin-top: 20px;
       }
+      &.switch {
+      }
       .but-group {
         flex: 1;
         & .icon {
@@ -1017,12 +991,12 @@ export default {
           &.on-off {
             background: url("../../assets/rebeng/on-off.png") no-repeat center
               center;
-            background-size: 38px 36px;
+            background-size: 42px 42px;
           }
           &.on-off-open {
             background: url("../../assets/rebeng/on-off-open.png") no-repeat
               center center;
-            background-size: 38px 36px;
+            background-size: 42px 42px;
           }
           &.zhileng {
             background: url("../../assets/rebeng/zhileng.png") no-repeat center
@@ -1058,18 +1032,9 @@ export default {
     }
   }
 }
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
 </style>
 <style rel="stylesheet/scss" lang="scss">
-.water-slider,
-.hotwater-slider {
+.water-slider {
   flex: 1;
   .el-slider__runway {
     background: linear-gradient(
