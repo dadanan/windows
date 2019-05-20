@@ -17,8 +17,8 @@
     <div class="mode-panel">
       <template v-if="formatItemsList[1] && formatItemsList[1].showStatus">
         <div class="card" v-for="(item, index) in getListData(formatItemsList[1].abilityId)" v-if="item.dirValue!=='4'" @click="switchMode(item.dirValue)">
-          <div class="icon" :class="{active: isOpen&&item.isChecked , hot: item.dirValue === '3' , cold: item.dirValue === '2'}"></div>
-          <p class="text" :class="{active: isOpen&&item.isChecked, hot: item.dirValue === '3' , cold: item.dirValue === '2'}">
+          <div class="icon" :class="{active: item.isChecked , hot: item.dirValue === '3' , cold: item.dirValue === '2'}"></div>
+          <p class="text" :class="{active: item.isChecked, hot: item.dirValue === '3' , cold: item.dirValue === '2'}">
             {{item.optionDefinedName}}
           </p>
         </div>
@@ -445,9 +445,7 @@ export default {
         });
 
         this.switchHandler();
-        if (this.isOpen) {
-          this.setPopDialogData();
-        }
+        this.setPopDialogData();
       });
     },
     switchHandler () {
@@ -652,8 +650,8 @@ export default {
       return result && result.abilityOptionList;
     },
     switchMode (index) {
-      if (!this.isOpen) {
-        this.$toast("当前关机状态，不可操作", "bottom");
+      if (this.isOpen) {
+        this.$toast("当前开机状态，不可操作", "bottom");
         return false;
       }
       // 模式 1制冷 8 制热
