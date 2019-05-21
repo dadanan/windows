@@ -145,7 +145,7 @@
               </div>
               <img @click='increaseTem' src='@/assets/add.png'>
             </div>
-            <div>
+            <!-- <div>
               <span class='info'>湿度</span>
               <img @click='reduceHum' src='@/assets/reduce.png'>
               <div>
@@ -153,7 +153,7 @@
                 <span class='icon'>%</span>
               </div>
               <img @click='increaseHum' src='@/assets/add.png'>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -321,6 +321,7 @@ export default {
       let value = option[index].optionValue;
       // 如果是致热模式，默认打开选项值为6的次级模式
       if (value == "4") {
+        this.setIconVisible(["isFloorHot"]);
         if (this.hasOptionalFunction()) {
           value = 41;
         }
@@ -694,6 +695,8 @@ export default {
               this.setIconVisible(["isVentilation"]);
             } else if (item.dirValue == 3) {
               this.setIconVisible(["isTopCold"]);
+            } else if (item.dirValue == 4) {
+              this.setIconVisible(["isFloorHot"]);
             } else {
               this.setIconVisible([""]);
             }

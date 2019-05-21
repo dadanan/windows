@@ -27,7 +27,7 @@
     </div>
 
     <div class="switch" @click="onOffMethod">
-      主机开关
+      <div class="icon" :class="isOpen ? 'on-off-open' : 'on-off'"></div>
     </div>
 
   </div>
@@ -40,7 +40,7 @@ import { setWechatTitle } from "utils";
 import img1 from "../../assets/bak3.jpg"; // 白天阴
 import img2 from "../../assets/bak2.jpg"; // 夜晚阴
 import img3 from "../../assets/bak1.jpg"; // 夜晚晴
-import img4 from "../../assets/rebeng/bak5.jpg"; // 白天晴
+import img4 from "../../assets/bak4.jpg"; // 白天晴
 import Store from "../wenkong/store.js";
 import {
   getModelVo,
@@ -554,6 +554,7 @@ export default {
 <style rel="stylesheet/scss" lang="scss" scoped>
 @import "src/common/scss/variable.scss";
 @import "src/common/scss/mixins.scss";
+@import "~@/assets/scss-function.scss";
 .main-wrapper {
   width: 100%;
   height: 100%;
@@ -615,24 +616,27 @@ export default {
   }
   .panel {
     text-align: center;
-    margin-top: 90px;
+    margin-top: tvw(375);
     .card {
       display: inline-block;
-      width: 115px;
-      height: 115px;
+      width: tvw(960);
+      height: tvw(960);
+      line-height: tvw(480);
       background: rgba(255, 255, 255, 0.13);
       font-size: 14px;
       color: #e0e0e0;
-      margin: 0 25px;
+      margin: 0 tvw(100);
       & p.active {
         color: #7fffe7;
       }
       .icon {
-        width: 45px;
-        height: 45px;
+        width: tvw(360);
+        height: tvw(360);
         border: 1px solid #ffffff;
         border-radius: 100%;
-        margin: 20px auto 15px auto;
+        margin: 0 auto;
+        display: inline-block;
+        vertical-align: text-top;
         &.cold {
           background: url("../../assets/rebeng/zhileng.png") no-repeat center
             center;
@@ -647,16 +651,29 @@ export default {
     }
   }
   .switch {
-    background: #7fffe7;
     color: #ffffff;
     width: 60%;
     text-align: center;
-    font-size: 18px;
     display: block;
     margin: 0 auto;
-    padding: 15px 0;
-    margin-top: 140px;
-    border-radius: 50px;
+    margin-top: tvw(750);
+    border-radius: 15vw;
+    border: 1px solid #fff;
+    .icon {
+      width: tvw(291);
+      height: tvw(291);
+      margin: 0 auto;
+      &.on-off {
+        background: url("../../assets/rebeng/on-off.png") no-repeat center
+          center;
+        background-size: 44px 44px;
+      }
+      &.on-off-open {
+        background: url("../../assets/rebeng/on-off-open.png") no-repeat center
+          center;
+        background-size: 44px 44px;
+      }
+    }
   }
 }
 </style>

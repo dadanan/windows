@@ -34,7 +34,7 @@
         <div class="card-panel">
           <div class="card">
             <p class="num" :class="currMode===coldMode ? 'cold' : currMode===hotMode ? 'hot' : ''">{{waterTemp}}°</p>
-            <p class="desc">设定回水温度</p>
+            <p class="desc">回水设定</p>
           </div>
         </div>
         <div class="block" v-if="currMode===hotMode">
@@ -50,11 +50,11 @@
         <div class="card-panel">
           <div class="card">
             <p class="num">{{waterTempGS}}°</p>
-            <p class="desc">供水温度</p>
+            <p class="desc">供水</p>
           </div>
           <div class="card">
             <p class="num">{{waterTempHS}}°</p>
-            <p class="desc">回水温度</p>
+            <p class="desc">回水</p>
           </div>
         </div>
       </div>
@@ -70,7 +70,7 @@
         <div class="card-panel">
           <div class="card">
             <p class="num hot">{{hotwater}}°</p>
-            <p class="desc">设定当前温度</p>
+            <p class="desc">设定</p>
           </div>
         </div>
         <div class="block">
@@ -81,13 +81,13 @@
         <div class="card-panel">
           <div class="card">
             <p class="num">{{hotwater}}°</p>
-            <p class="desc">当前温度</p>
+            <p class="desc">当前</p>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="panel">
+    <div class="panel break">
       <div class="title">
         <div class="icon break">状态</div>
         <div class="state" v-if="breakdownList.length===0"><i class="el-icon-success"></i>正常</div>
@@ -116,7 +116,7 @@ import { setWechatTitle } from "utils";
 import img1 from "../../assets/bak3.jpg"; // 白天阴
 import img2 from "../../assets/bak2.jpg"; // 夜晚阴
 import img3 from "../../assets/bak1.jpg"; // 夜晚晴
-import img4 from "../../assets/rebeng/bak5.jpg"; // 白天晴
+import img4 from "../../assets/bak4.jpg"; // 白天晴
 import Store from "../wenkong/store.js";
 import {
   getModelVo,
@@ -721,6 +721,7 @@ export default {
 <style rel="stylesheet/scss" lang="scss" scoped>
 @import "src/common/scss/variable.scss";
 @import "src/common/scss/mixins.scss";
+@import "~@/assets/scss-function.scss";
 .main-wrapper {
   width: 100%;
   height: 100%;
@@ -782,22 +783,22 @@ export default {
   }
   .mode-panel {
     text-align: center;
-    margin-top: 45px;
+    margin-top: tvw(375);
     display: flex;
     justify-content: space-around;
     align-items: center;
     .card {
-      width: 105px;
-      height: 105px;
+      width: tvw(880);
+      height: tvw(880);
       background: rgba(255, 255, 255, 0.13);
-      font-size: 14px;
+      font-size: tvw(120);
       border-radius: 10px;
       .icon {
-        width: 45px;
-        height: 45px;
+        width: tvw(375);
+        height: tvw(375);
         border: 1px solid #ffffff;
         border-radius: 100%;
-        margin: 20px auto 15px auto;
+        margin: tvw(120) auto;
         &.cold {
           background: url("../../assets/rebeng/zhileng.png") no-repeat center
             center;
@@ -849,10 +850,12 @@ export default {
     border-top: 1px solid #eeeeee;
   }
   .panel {
-    margin: 0 10px;
-    padding-bottom: 25px;
+    margin: 0 tvw(42);
+    &.break {
+      padding-bottom: tvw(375);
+    }
     .title {
-      font-size: 22px;
+      font-size: tvw(183);
       position: relative;
       display: flex;
       justify-content: space-between;
@@ -864,20 +867,20 @@ export default {
           background: url("../../assets/rebeng/hot-water-active.png") no-repeat
             center center;
           background-size: 35px 28px;
-          height: 45px;
-          width: 45px;
+          height: tvw(375);
+          width: tvw(375);
           display: inline-block;
-          vertical-align: -13px;
+          vertical-align: -tvw(108);
         }
         &.break::before {
           content: "";
           background: url("../../assets/rebeng/state.png") no-repeat center
             center;
           background-size: 35px 28px;
-          height: 45px;
-          width: 45px;
+          height: tvw(375);
+          width: tvw(375);
           display: inline-block;
-          vertical-align: -13px;
+          vertical-align: -tvw(108);
         }
       }
       .state {
@@ -888,18 +891,18 @@ export default {
       }
     }
     .item {
-      padding: 20px 15px 30px 15px;
+      padding: tvw(125);
       .list {
         border-top: 1px solid #dfdfdf;
         & ul li {
-          font-size: 13px;
-          margin-top: 20px;
+          font-size: tvw(108);
+          margin-top: tvw(166);
           .gray {
             color: #9a9a9a;
             &::before {
               display: inline-block;
-              width: 10px;
-              height: 10px;
+              width: tvw(83);
+              height: tvw(83);
               border-radius: 50%;
               background: #ffffff;
               content: "";
@@ -908,22 +911,22 @@ export default {
           }
           .line {
             border: 1px solid #dfdfdf;
-            margin: 0 20px;
+            margin: 0 tvw(166);
           }
         }
       }
       .block {
         display: flex;
         align-items: center;
-        font-size: 14px;
+        font-size: tvw(116);
         font-weight: bold;
         .min {
           color: #2921ff;
-          width: 24px;
+          width: tvw(200);
         }
         .max {
           color: #ff3b21;
-          width: 32px;
+          width: tvw(266);
           text-align: right;
           &.cold {
             color: #06fbda;
@@ -938,7 +941,7 @@ export default {
         display: inline-block;
         text-align: center;
         .num {
-          font-size: 22px;
+          font-size: tvw(183);
           &.hot {
             color: #ff874c;
           }
@@ -947,7 +950,7 @@ export default {
           }
         }
         .desc {
-          font-size: 12px;
+          font-size: tvw(100);
         }
       }
     }

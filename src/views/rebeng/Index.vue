@@ -14,17 +14,15 @@
       <span>PM2.5: {{getOuterPM}}ug/m3&nbsp;&nbsp;</span>
     </div>
 
+    <div class='switch'>
+      <div v-show='formatItemsList[0] && formatItemsList[0].showStatus' @click='onOffMethod'>
+        <div class="icon" :class="isOpen ? 'on-off-open' : 'on-off'"></div>
+        <!-- <p>{{formatItemsList[0] && formatItemsList[0].showName}}</p> -->
+      </div>
+    </div>
+
     <!-- 底部按钮 -->
     <div class="footer fixed">
-      <div class="but-list switch">
-        <div class="but-group" @click="onOffMethod">
-          <div class="icon" :class="isOpen ? 'on-off-open' : 'on-off'"></div>
-          <div class="text">开关机</div>
-        </div>
-        <div class="but-group"></div>
-        <div class="but-group"></div>
-        <div class="but-group"></div>
-      </div>
       <div class="but-list">
         <div class="but-group" @click="showWater">
           <div class="icon water-temp"></div>
@@ -769,9 +767,11 @@ export default {
 <style rel="stylesheet/scss" lang="scss" scoped>
 @import "src/common/scss/variable.scss";
 @import "src/common/scss/mixins.scss";
+@import "~@/assets/scss-function.scss";
+
 .main-wrapper {
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   position: fixed;
   overflow: auto;
   top: 0;
@@ -829,7 +829,7 @@ export default {
     }
   }
   .content {
-    padding: 20px 15px 30px 15px;
+    padding: tvw(166) tvw(125) tvw(250) tvw(125);
     color: #000000;
     background: #ffffff;
     display: flex;
@@ -838,29 +838,29 @@ export default {
       align-items: center;
     }
     .icon {
-      width: 40px;
-      height: 40px;
-      margin-right: 10px;
+      width: tvw(333);
+      height: tvw(333);
+      margin-right: tvw(83);
       box-sizing: content-box;
       .breakdown {
         background: url("../../assets/rebeng/breakdown-icon.png") no-repeat
           center center;
         background-size: 35px 35px;
-        width: 35px;
-        height: 35px;
+        width: tvw(291);
+        height: tvw(291);
       }
       .on-off {
         background: url("../../assets/rebeng/on-off-black.png") no-repeat center
           center;
         background-size: 35px 35px;
-        width: 35px;
-        height: 35px;
+        width: tvw(291);
+        height: tvw(291);
         border: 1px solid #333333;
         border-radius: 100%;
       }
       .desc {
-        margin-top: 5px;
-        font-size: 11px;
+        margin-top: tvw(42);
+        font-size: tvw(92);
         color: #333333;
       }
     }
@@ -868,22 +868,22 @@ export default {
       flex: 1;
       width: 100%;
       position: relative;
-      margin-bottom: 45px;
+      margin-bottom: tvw(375);
       .title {
-        font-size: 22px;
+        font-size: tvw(183);
         position: relative;
-        height: 35px;
-        line-height: 35px;
-        margin-bottom: 20px;
+        height: tvw(291);
+        line-height: tvw(291);
+        margin-bottom: tvw(166);
         .state {
           float: right;
           font-weight: bold;
           &::before {
             position: absolute;
             content: "";
-            width: 30px;
-            height: 30px;
-            right: 45px;
+            width: tvw(250);
+            height: tvw(250);
+            right: tvw(375);
             top: 1px;
           }
           &.success {
@@ -907,38 +907,38 @@ export default {
       .list {
         border-top: 1px solid #dfdfdf;
         & ul li {
-          font-size: 13px;
-          margin-top: 20px;
+          font-size: tvw(108);
+          margin-top: tvw(166);
           .gray {
             color: #9a9a9a;
             &::before {
               display: inline-block;
-              width: 10px;
-              height: 10px;
+              width: tvw(84);
+              height: tvw(84);
               border-radius: 50%;
               background: linear-gradient(to top right, #599aff, #9a57ff);
               content: "";
-              margin-right: 5px;
+              margin-right: tvw(42);
             }
           }
           .line {
             border: 1px solid #dfdfdf;
-            margin: 0 20px;
+            margin: 0 tvw(166);
           }
         }
       }
       .block {
         display: flex;
         align-items: center;
-        font-size: 14px;
+        font-size: tvw(117);
         font-weight: bold;
         .min {
           color: #4ca6ff;
-          width: 24px;
+          width: tvw(200);
         }
         .max {
           color: #ff874c;
-          width: 32px;
+          width: tvw(267);
           text-align: right;
         }
       }
@@ -950,54 +950,42 @@ export default {
         display: inline-block;
         text-align: center;
         .num {
-          font-size: 22px;
+          font-size: tvw(183);
           color: #333333;
         }
         .desc {
-          font-size: 12px;
+          font-size: tvw(100);
           color: #999999;
         }
       }
     }
   }
   .footer {
-    margin-top: 10px;
+    margin-top: tvw(83);
     text-align: center;
-    font-size: 13px;
+    font-size: tvw(108);
     @media only screen and (min-device-width: 320px) and (max-device-width: 340px) {
-      margin-top: 10px;
+      margin-top: tvw(83);
     }
     &.fixed {
       position: fixed;
-      bottom: 10px;
+      bottom: tvw(83);
       width: 100%;
     }
     .but-list {
       display: flex;
       &:not(:first-child) {
-        margin-top: 20px;
-      }
-      &.switch {
+        margin-top: tvw(166);
       }
       .but-group {
         flex: 1;
         & .icon {
-          width: 35px;
-          height: 35px;
+          width: tvw(291);
+          height: tvw(291);
           border: 1px solid #ffffff;
           border-radius: 100%;
           margin: 0 auto;
-          margin-bottom: 5px;
-          &.on-off {
-            background: url("../../assets/rebeng/on-off.png") no-repeat center
-              center;
-            background-size: 42px 42px;
-          }
-          &.on-off-open {
-            background: url("../../assets/rebeng/on-off-open.png") no-repeat
-              center center;
-            background-size: 42px 42px;
-          }
+          margin-bottom: tvw(42);
           &.zhileng {
             background: url("../../assets/rebeng/zhileng.png") no-repeat center
               center;
@@ -1028,6 +1016,31 @@ export default {
             background-size: 18px 16px;
           }
         }
+      }
+    }
+  }
+  .switch {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: tvw(2685);
+    margin: tvw(200) auto;
+    & .icon {
+      width: tvw(291);
+      height: tvw(291);
+      border: 1px solid #ffffff;
+      border-radius: 100%;
+      margin: 0 auto;
+      margin-bottom: tvw(42);
+      &.on-off {
+        background: url("../../assets/rebeng/on-off.png") no-repeat center
+          center;
+        background-size: 44px 44px;
+      }
+      &.on-off-open {
+        background: url("../../assets/rebeng/on-off-open.png") no-repeat center
+          center;
+        background-size: 44px 44px;
       }
     }
   }
