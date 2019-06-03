@@ -835,7 +835,7 @@ export default {
           // 定时请求接口数据，更新页面数据
           this.setInter = setInterval(() => {
             this.getIndexFormatData();
-          }, 1000);
+          }, 3000);
           //滤网检查
           const windOption1 = data.abilitysList;
           for (var i = 0; i < windOption1.length; i++) {

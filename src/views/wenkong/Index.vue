@@ -47,11 +47,11 @@
         %
       </p>
     </div>
-    <div class='function' v-show='isOptionalFunctionOpen && hasOptionalFunction()'>
+    <!-- <div class='function' v-show='isOptionalFunctionOpen && hasOptionalFunction()'>
       <div v-for='(item,index) in getFunctionList' @click='functionClicked(item)' :class="{'able': currFunction === index}" :key='item.id'>
         <span>{{item.optionDefinedName || item.optionName}}</span>
       </div>
-    </div>
+    </div> -->
     <div class='menu'>
       <div @click='modelClickedHandler(formatItemsList[0] && formatItemsList[0].abilityId,0)'>
         <div>
@@ -801,8 +801,19 @@ export default {
       return result && result.abilityOptionList;
     },
     getLocation () {
-      getLocation(this.deviceId).then(res => {
-        this.location = res.data.location;
+      getLocation(this.masterDeviceId).then(res => {
+         const data = res.data;
+
+          // 取地址的省市区信息
+          if (data.location) {
+            let location = data.location.split(",");
+            location.pop();
+            location = location.filter(item => item).join(" ");
+            this.location = location;
+          }
+          if (data.mapGps) {
+            Store.save("mapGps", data.mapGps);
+          }
       });
     },
     getWeather () {

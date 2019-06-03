@@ -40,6 +40,7 @@ export default {
           deviceId: getQueryString("deviceId"),
           masterOpenId: getQueryString("masterOpenId"),
           token: getQueryString("token"),
+          teamIds: getQueryString("teamId"),
           customerId: getQueryString("customerId")
         };
         Store.save("obj", JSON.stringify(obj));

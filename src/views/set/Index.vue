@@ -48,6 +48,7 @@
         <div class="cell-right"></div>
       </div>
 
+
       <div class="cell-item white" @click="intoMap">
         <div class="cell-left">
           <span>手动设置位置</span>
@@ -120,6 +121,14 @@
         <a>
           <div class="cell-left">
             <span>反馈记录</span>
+          </div>
+          <div class="cell-right"></div>
+        </a>
+      </div>
+      <div class="cell-item white" @click="ceshi">
+        <a>
+          <div class="cell-left">
+            <span>测试页面</span>
           </div>
           <div class="cell-right"></div>
         </a>
@@ -244,7 +253,7 @@ export default {
       batteryList: [],
       setPwdFlag: false,
       deviceId: this.$route.query.deviceId,
-      customerId: this.$route.query.customerId,
+      customerId: Store.fetch("customerId"),
       masterFormat: this.$route.query.masterFormat,
       hasChildren: this.$route.query.hasChildren,
       hasTwoAbility: this.$route.query.hasTwoAbility,
@@ -281,6 +290,13 @@ export default {
     }
   },
   methods: {
+    ceshi(){
+      this.$router.push({
+        path: "/ceshi",
+        query: {
+        }
+      });
+    },
     getIndexAbilityData () {
       // 获取H5控制页面功能项数据，带isSelect参数
       getModelVo({ deviceId: this.$route.query.deviceId, pageNo: 1 }).then(

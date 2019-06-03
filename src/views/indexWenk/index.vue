@@ -25,8 +25,8 @@
           <img src='@/assets/wenkong_close.png'>
           <!-- <img src='@/assets/wenkong_close.png' v-else> -->
         </div>
-        <p v-if="energy.data6 == 1">开</p>
-        <p v-else>关</p>
+        <!-- <p v-if="energy.data6 == 1">开</p>
+        <p v-else>关</p> -->
 
       </div>
     </div>

@@ -534,3 +534,38 @@ export function getPageDatas(data) {
     headers: { Ticket: Store.fetch('Ticket') }
   })
 }
+
+
+//共享组设备
+export function teamToken(data) {
+  return http({
+    url: `${BASE_URL}/api/h5/api/team/token`,
+    method: 'post',
+    data,
+    headers: { Ticket: Store.fetch('Ticket') }
+  })
+}
+
+
+//分享接收绑定
+export function teamShare(data) {
+  return http({
+    url: `${BASE_URL}/api/h5/api/team/share`,
+    method: 'post',
+    data,
+    headers: { Ticket: Store.fetch('Ticket') }
+  })
+}
+
+
+//帮助文件
+export function helpFiles(data) {
+  return http({
+    url: `${BASE_URL}/api/h5/high/helpFiles`,
+    method: 'post',
+    data,
+    headers: { Ticket: Store.fetch('Ticket'),
+    Authorization: Store.fetch('Token')
+  }
+  })
+}

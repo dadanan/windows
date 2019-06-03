@@ -8,6 +8,8 @@
         </div>
         <div slot="txt" style="color:#20aaf8;margin-left:5px; position: absolute; right: 150px;" v-show="groupFlag" @click="openTeam(item.teamId)">组开
         </div>
+        <div slot="txt" style="color:#20aaf8;margin-left:5px; position: absolute; right: 180px;" v-show="groupFlag" @click="teamShare(item.teamId)">组分享
+        </div>
         <div slot="txt" style="color:#20aaf8;margin-left:5px; position: absolute; right: 120px;" v-show="groupFlag" @click="closeTeam(item.teamId)">组关
         </div>
         <div slot="txt" style="color:#20aaf8;margin-left:5px; position: absolute; right: 90px;" v-show="groupFlag" @click="OpenGroup(item)">编辑
@@ -39,7 +41,7 @@
                   </p>
                   <template v-if='child.hasOwnProperty("childId")'>
                     <p><span>从设备ID:{{ child.childId }}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>主设备ID:{{child.masterDeviceId}}</span></p>
-                    <p>主机状态:{{child.hostPowerStatus ? '开' : '关'}}</p>
+                    <p>主机型号:{{child.deviceTypeName}}</p>
                   </template>
                   <template v-else>
                     <p>ID:{{ child.deviceId }}</p>
@@ -52,8 +54,8 @@
               <span class="group" v-if="loopValue === true" @click.stop="OpenDev(child,item.teamId,1)">分组</span>
               <span class="edit" v-if="loopValue === true" @click.stop="OpenDev(child,2)">编辑</span>
               <span class="delete" v-if="loopValue === true" @click.stop="deleteDev(child)" style="color: #a0a0a0;">删除</span>
-              <p>PM2.5</p>
-              <p>{{child.pm}}ug/m³</p>
+              <p>{{child.listShowName}}</p>
+              <p>{{child.listShowValue}}{{child.listShowUnit}}</p>
             </div>
           </div>
           <div v-if="item.deviceItemPos.length === 0">暂无产品</div>
@@ -173,7 +175,8 @@ import {
   childDeviceList,
   deleteDevice,
   getBgImgs,
-  teamControl
+  teamControl,
+  teamShare
 } from "../wenkong/api";
 import Store from "../wenkong/store";
 
@@ -211,6 +214,15 @@ export default {
   },
 
   methods: {
+    teamShare(teams){
+      this.$router.push({
+        path: "/teamShare",
+        query: {
+          teamID: teams,
+          // customerId: this.customerId
+        }
+      });
+    },
     // forbidBack () {
     //         window.history.pushState('forward', null, '#');
     //         // alert(1)
@@ -233,7 +245,7 @@ export default {
             if (device.deviceId == 1 || device.deviceId == 11 || device.deviceId == 12 || device.deviceId == 13 || device.deviceId == 14) {
 
             } else {
-              this.childDeviceList(device.deviceId, deviceList);
+              this.childDeviceList(device.deviceId, deviceList,device.onlineStatus);
             }
           });
         });
@@ -242,11 +254,12 @@ export default {
     /**
      * 获取主设备id下的从设备
      */
-    childDeviceList (id, data) {
+    childDeviceList (id, data,datas) {
       childDeviceList(id).then(res => {
         res.data.forEach(item => {
           item["deviceId"] = item.id;
           item["masterDeviceId"] = id;
+          item.onlineStatus= datas
         });
 
         // 找到主设备的index
@@ -670,6 +683,35 @@ export default {
           this.$toast(error.msg, "bottom");
         });
     },
+    shareBinds (obj) {
+      // 分享绑定
+      teamShare({
+        masterOpenId: obj.masterOpenId,
+        teamId: obj.teamIds,
+        token: obj.token
+      })
+        .then(res => {
+          if (res.code === 200) {
+            if (res.data) {
+              // 成功
+              Toast({
+                mes: "绑定成功！",
+                timeout: 1500,
+                icon: "success"
+              });
+            } else {
+              console.log("绑定失败：", res);
+            }
+            this.obtainMyDevice();
+            // 绑定成功后，删除“绑定相关”数据
+            Store.remove("obj");
+          }
+        })
+        .catch(error => {
+          Store.remove("obj");
+          this.$toast(error.msg, "bottom");
+        });
+    },
     getBgImgs () {
       getBgImgs().then(res => {
         if (res.code === 200 && Array.isArray(res.data)) {
@@ -685,8 +727,12 @@ export default {
     console.log(JSON.parse(Store.fetch("obj")))
     if (JSON.parse(Store.fetch("obj"))) {
       // 分享人进来
+      if(JSON.parse(Store.fetch("obj")).deviceId){
+        this.shareBind(JSON.parse(Store.fetch("obj")));
+      }else{
+        this.shareBinds(JSON.parse(Store.fetch("obj")));
+      }
       console.log("从分享进来");
-      this.shareBind(JSON.parse(Store.fetch("obj")));
     } else {
       console.log("未从分享进来");
       this.obtainMyDevice();

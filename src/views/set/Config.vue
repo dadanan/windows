@@ -134,11 +134,10 @@
       <yd-accordion-item title="帮助文件">
         <div style="padding: .24rem;background: #f2f2f2;">
           <table class="table2">
-            <tr>
-              <td>设备接线与安装</td>
-              <td>查看</td>
-              <td>
-                <a href="#">下载</a>
+            <tr v-for='item in filesList' :key="item.id" style="height:40px">
+              <td> {{item.substring((item.lastIndexOf('/')) + 1, item.length )}}</td>
+              <td style="width:50px;">
+                <a :href="item">下载</a>
               </td>
             </tr>
           </table>
@@ -224,7 +223,8 @@ import {
   editManageName,
   queryDeviceIconList,
   setDeviceIcon,
-  setLinkStatus
+  setLinkStatus,
+  helpFiles
 } from "../wenkong/api";
 import Store from "../wenkong/store";
 export default {
@@ -257,10 +257,16 @@ export default {
       dirValueList1: [],
       status: true,
       deviceName: "",
-      ingList:[]
+      ingList:[],
+      filesList:[]
     };
   },
   methods: {
+    helpFiles(){
+      helpFiles({value:this.customerId}).then(res=>{
+        this.filesList = res.data
+      })
+    },
     imgLi(val){
       setDeviceIcon({'deviceId':this.deviceId,"iconSelect":val.sort}).then(res=>{
         if(res.code == 200){
@@ -543,6 +549,7 @@ export default {
     setTimeout(() => {
       Loading.close();
     }, 300);
+    this.helpFiles()
     this.childDeviceList();
     this.getModelList();
     this.getModelVo();

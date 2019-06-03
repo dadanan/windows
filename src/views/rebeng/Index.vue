@@ -39,11 +39,11 @@
           <!-- 热水 -->
           <div class="text">热水</div>
         </div>
-        <div class="but-group" @click="switchMode('1')" v-if="currMode ==='8'">
+        <div class="but-group" @click="switchMode('1')" v-if="currMode ==='1'">
           <div class="icon zhileng"></div>
           <div class="text">制冷</div>
         </div>
-        <div class="but-group" @click="switchMode('8')" v-if="currMode ==='1'">
+        <div class="but-group" @click="switchMode('8')" v-if="currMode ==='8'">
           <div class="icon gongnuan"></div>
           <div class="text">供暖</div>
         </div>
@@ -86,7 +86,7 @@
           <div class="card-panel">
             <div class="card">
               <p class="num">{{hotwater}}°</p>
-              <p class="desc">设定当前温度</p>
+              <p class="desc">设定</p>
             </div>
           </div>
           <div class="block">
@@ -96,8 +96,8 @@
           </div>
           <div class="card-panel">
             <div class="card">
-              <p class="num">{{hotwater}}°</p>
-              <p class="desc">当前温度</p>
+              <p class="num">{{currHotwater}}°</p>
+              <p class="desc">水温</p>
             </div>
           </div>
         </div>
@@ -140,9 +140,12 @@
 import { Loading, Toast } from "vue-ydui/dist/lib.rem/dialog";
 import { Popup } from "vue-ydui/dist/lib.rem/popup";
 import { setWechatTitle } from "utils";
-import img1 from "../../assets/bak3.jpg"; // 白天阴
-import img2 from "../../assets/bak2.jpg"; // 夜晚阴
-import img3 from "../../assets/bak1.jpg"; // 夜晚晴
+// import img1 from "../../assets/bak3.jpg"; // 白天阴
+// import img2 from "../../assets/bak2.jpg"; // 夜晚阴
+// import img3 from "../../assets/bak1.jpg"; // 夜晚晴
+import img1 from "../../assets/rebeng/bak4.jpeg"; // 白天阴
+import img2 from "../../assets/rebeng/bak4.jpeg"; // 夜晚阴
+import img3 from "../../assets/rebeng/bak4.jpeg"; // 夜晚晴
 import img4 from "../../assets/rebeng/bak4.jpeg"; // 白天晴
 import Store from "../wenkong/store.js";
 import {
@@ -159,7 +162,7 @@ let currValues = '' // 当前用户所在的左侧滑杆的值
 export default {
   data () {
     return {
-      shutdown: "", // 关机
+      shutdown: img1, // 关机
       cloudyDay: img1, // 阴天
       sunnyDay: img4, // 晴天
       cloudyNight: img2, // 夜晚阴
@@ -183,6 +186,7 @@ export default {
       outerHum: "", // 湿度
       outerPm: "", // PM2.5
       deviceId: this.$route.query.deviceId,
+      masterDeviceId: Store.fetch("masterDeviceId"),
       wxDeviceId: this.$route.query.wxDeviceId,
       customerId: this.$route.query.customerId,
       setInter: undefined, // 定时id
@@ -194,7 +198,7 @@ export default {
       waterTempFlag: false,
       waterTemp: 36,
       hotwater: 30,
-      currHotwater: 56,
+      currHotwater: 46,
       waterTemp1: 0,
       waterTemp2: 0,
       breakdownList: [],
@@ -407,7 +411,7 @@ export default {
           // 定时请求接口数据，更新页面数据
           this.setInter = setInterval(() => {
             this.getIndexFormatData();
-          }, 1000);
+          }, 3000);
 
           this.setInter2 = setInterval(() => {
             this.getWeather();
@@ -621,9 +625,8 @@ export default {
       this.img = currentBak;
     },
     getLocation () {
-      getLocation(this.deviceId).then(res => {
+      getLocation(this.masterDeviceId).then(res => {
         const data = res.data;
-
         // 取地址的省市区信息
         if (data.location) {
           let location = data.location.split(",");
@@ -637,7 +640,7 @@ export default {
       });
     },
     getWeather () {
-      getWeather(this.deviceId).then(res => {
+      getWeather(this.masterDeviceId).then(res => {
         const data = res.data;
 
         this.weather = data.weather;
@@ -656,7 +659,7 @@ export default {
       const bgImgs = JSON.parse(Store.fetch("bgImgs"));
       // 依次排列：关机，白天-晴天，白天-阴天，夜晚-晴天，夜晚-阴天
       if (bgImgs[0]) {
-        this.shutdown = bgImgs[0];
+        this.shutdown = bgImgs[1];
       }
       if (bgImgs[1]) {
         this.sunnyDay = bgImgs[1];
@@ -772,7 +775,7 @@ export default {
 .main-wrapper {
   width: 100vw;
   height: 100vh;
-  position: fixed;
+  position: absolute;
   overflow: auto;
   top: 0;
   bottom: 0;

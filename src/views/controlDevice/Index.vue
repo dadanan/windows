@@ -282,7 +282,7 @@ export default {
           // 定时请求接口数据，更新页面数据
           this.setInter = setInterval(() => {
             this.getIndexFormatData();
-          }, 1000);
+          }, 3000);
 
           this.setInter2 = setInterval(() => {
             this.getWeather();

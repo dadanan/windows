@@ -1,5 +1,5 @@
 <template>
-  <div class="main-wrapper" v-show='pageIsShow' :class="{ active: isOpen === true }" @touchmove.prevent :style="{ 'background-image': 'url(' + img + ')'}">
+  <div class="main-wrapper" v-show='pageIsShow' :class="{ active: isOpen === true }" :style="{ 'background-image': 'url(' + img + ')'}">
     <div class="header">
       <div class="return" @click="returnMethod"></div>
       <span class="edit" @click="intoSet"></span>
@@ -157,6 +157,7 @@ export default {
       outerHum: "", // 湿度
       outerPm: "", // PM2.5
       deviceId: this.$route.query.deviceId,
+      masterDeviceId: Store.fetch("masterDeviceId"),
       wxDeviceId: this.$route.query.wxDeviceId,
       customerId: this.$route.query.customerId,
       setInter: undefined, // 定时id
@@ -387,7 +388,7 @@ export default {
           // 定时请求接口数据，更新页面数据
           this.setInter = setInterval(() => {
             this.getIndexFormatData();
-          }, 1000);
+          }, 3000);
 
           this.setInter2 = setInterval(() => {
             this.getWeather();
@@ -574,7 +575,7 @@ export default {
       this.img = currentBak;
     },
     getLocation () {
-      getLocation(this.deviceId).then(res => {
+      getLocation(this.masterDeviceId).then(res => {
         const data = res.data;
 
         // 取地址的省市区信息
@@ -590,7 +591,7 @@ export default {
       });
     },
     getWeather () {
-      getWeather(this.deviceId).then(res => {
+      getWeather(this.masterDeviceId).then(res => {
         const data = res.data;
 
         this.weather = data.weather;
@@ -651,11 +652,10 @@ export default {
     },
     switchMode (index) {
       if (this.isOpen) {
-        this.$toast("当前开机状态，不可操作", "bottom");
+        this.$toast("请先关机，再切换模式", "bottom");
         return false;
       }
       // 模式 1制冷 8 制热
-      console.log(index)
       const tempArray = this.abilitysList.filter(
         item => item.abilityId == this.formatItemsList[1].abilityId
       )[0];
@@ -725,7 +725,7 @@ export default {
 .main-wrapper {
   width: 100%;
   height: 100%;
-  position: fixed;
+  position: absolute;
   overflow: auto;
   top: 0;
   bottom: 0;
@@ -943,10 +943,10 @@ export default {
         .num {
           font-size: tvw(183);
           &.hot {
-            color: #ff874c;
+            color: #ff8925;
           }
           &.cold {
-            color: #2199ff;
+            color: #2921ff;
           }
         }
         .desc {

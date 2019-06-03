@@ -41,6 +41,9 @@ const ReBengIndex = resolve => require(['@/views/rebeng/Index'], resolve)
 const ControlDeviceIndex = resolve => require(['@/views/controlDevice/Index'], resolve)
 const AirCoolIndex = resolve => require(['@/views/indexAirCool/Index'], resolve)
 
+
+const TeamShare = resolve => require(['@/views/set/teamShare'], resolve)
+const Ceshi = resolve => require(['@/views/set/ceshi'], resolve)
 let routes = [
   {
     path: '*',
@@ -49,6 +52,20 @@ let routes = [
   {
     path: '/auth',
     component: Auth,
+    meta: {
+      title: ''
+    }
+  },
+  {
+    path: '/teamShare',
+    component: TeamShare,
+    meta: {
+      title: '设备组分享'
+    }
+  },
+  {
+    path: '/ceshi',
+    component: Ceshi,
     meta: {
       title: ''
     }

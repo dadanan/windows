@@ -508,7 +508,7 @@ export default {
         this.setInter = setInterval(() => {
             this.getIndexFormatData();
             this.getWeather();
-        }, 2000);
+        }, 3000);
     },
     getIndexAbilityData() {
       // 获取H5控制页面功能项数据，带isSelect参数
@@ -542,7 +542,7 @@ export default {
           this.setInter = setInterval(() => {
             this.getIndexFormatData();
             this.getWeather();
-          }, 2000);
+          }, 3000);
 
           this.pageIsShow = true;
         }

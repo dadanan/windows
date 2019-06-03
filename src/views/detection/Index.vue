@@ -413,7 +413,7 @@ export default {
           // 定时请求接口数据，更新页面数据
           this.setInter = setInterval(() => {
             this.getIndexFormatData();
-          }, 1000);
+          }, 3000);
 
           this.setInter2 = setInterval(() => {
             this.getWeather();
@@ -432,7 +432,6 @@ export default {
       const findTheAbility = (data, id) => {
         return data.filter(item => item.id == id)[0];
       };
-
       let ids = this.formatItemsList
         .filter(item => item.showStatus == 1 && item.abilityId)
         .map(item => item.abilityId);
