@@ -41,6 +41,7 @@ const ReBengIndex = resolve => require(['@/views/rebeng/Index'], resolve)
 const ControlDeviceIndex = resolve => require(['@/views/controlDevice/Index'], resolve)
 const AirCoolIndex = resolve => require(['@/views/indexAirCool/Index'], resolve)
 
+const VrvIndex = resolve => require(['@/views/vrv/Index'], resolve)
 
 const TeamShare = resolve => require(['@/views/set/teamShare'], resolve)
 const Ceshi = resolve => require(['@/views/set/ceshi'], resolve)
@@ -273,6 +274,13 @@ let routes = [
   {
     path: '/aircoolindex',
     component: AirCoolIndex,
+    meta: {
+      title: ''
+    }
+  },
+  {
+    path: '/vrvindex',
+    component: VrvIndex,
     meta: {
       title: ''
     }

@@ -113,6 +113,15 @@ export default {
             deviceId: this.deviceId
           }
         })
+      }else if(formatName === 'VRV空调') {
+        // VRV空调
+        this.$router.push({
+          path: '/vrvindex',
+          query: {
+            wxDeviceId: this.wxDeviceId,
+            deviceId: this.deviceId
+          }
+        })
       }else{
         this.$router.push({
           path: '/index',

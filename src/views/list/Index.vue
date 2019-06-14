@@ -41,7 +41,7 @@
                   </p>
                   <template v-if='child.hasOwnProperty("childId")'>
                     <p><span>从设备ID:{{ child.childId }}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>主设备ID:{{child.masterDeviceId}}</span></p>
-                    <p>主机型号:{{child.deviceTypeName}}</p>
+                    <p>主机型号:{{child.deviceModelName}}</p>
                   </template>
                   <template v-else>
                     <p>ID:{{ child.deviceId }}</p>
@@ -638,6 +638,12 @@ export default {
         // 纯检测器
         this.$router.push({
           path: "/aircoolindex",
+          query
+        });
+      }else if (child.formatName === "VRV空调") {
+        // 纯检测器
+        this.$router.push({
+          path: "/vrvindex",
           query
         });
       }
