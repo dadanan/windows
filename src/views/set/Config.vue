@@ -549,7 +549,7 @@ export default {
     setTimeout(() => {
       Loading.close();
     }, 300);
-    this.helpFiles()
+    // this.helpFiles()
     this.childDeviceList();
     this.getModelList();
     this.getModelVo();

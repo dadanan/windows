@@ -586,7 +586,7 @@ export default {
           path: "/index",
           query
         });
-      } else if (child.formatName === "检测器") {
+      } else if (child.formatName === "负离子检测器") {
         // 纯检测器
         this.$router.push({
           path: "/detection",
@@ -640,10 +640,40 @@ export default {
           path: "/aircoolindex",
           query
         });
+      }else if (child.formatName === "万能板") {
+        // 纯检测器
+        this.$router.push({
+          path: "/wnbindex",
+          query
+        });
       }else if (child.formatName === "VRV空调") {
         // 纯检测器
         this.$router.push({
           path: "/vrvindex",
+          query
+        });
+      }else if (child.formatName === "混水控制器") {
+        // 纯检测器
+        this.$router.push({
+          path: "/mixWater",
+          query
+        });
+      }else if (child.formatName === "漏水保护器") {
+        // 漏水保护器
+        this.$router.push({
+          path: "/quality",
+          query
+        });
+      }else if (child.formatName === "水质检测器") {
+        // 水质检测器
+        this.$router.push({
+          path: "/leakingWater",
+          query
+        });
+      }else if (child.formatName === "辐射调温混水控制器") {
+        // 水质检测器
+        this.$router.push({
+          path: "/mixFsWater",
           query
         });
       }
@@ -945,7 +975,8 @@ export default {
             position: absolute;
             width: 100%;
             height: 70px;
-            bottom: 0px;
+            bottom: -4px;
+            left: 0px;
             text-align: center;
             color: #ffffff;
             background: url("../../assets/bak.png") no-repeat center center;
@@ -967,7 +998,9 @@ export default {
             }
           }
           & img {
-            width: 100%;
+            width: 60%;
+            margin-left: 20%;
+            margin-top: 10%;
             height: auto;
           }
         }

@@ -3,6 +3,7 @@
     <div class="header">
       <div class="return" @click="returnMethod"></div>
       <span class="edit" @click="intoSet"></span>
+      <span>{{deviceName}}</span>
       <span class="time" v-if="1===2"></span>
     </div>
     <!-- 基本信息 -->
@@ -23,28 +24,66 @@
 
     <!-- 底部按钮 -->
     <div class="footer fixed">
-      <div class="but-list">
+      <div class="but-list" v-if="formatItemsList[12].abilityId && formatItemsList[12].showStatus">
         <div class="but-group" @click="showWater">
           <div class="icon water-temp"></div>
           <!-- 水温 -->
           <div class="text">水温</div>
         </div>
-        <div class="but-group" @click="showBreakdown">
+        <div class="but-group" @click="showBreakdown"  v-if="breakdownList.length===0">
+          <div class="icon successs"></div>
+          <!-- 故障 -->
+          <div class="text">正常</div>
+        </div>
+        <div class="but-group" @click="showBreakdown" v-else>
           <div class="icon breakdown"></div>
           <!-- 故障 -->
           <div class="text">故障</div>
         </div>
-        <div class="but-group" @click="showHotWater">
+        
+        <div class="but-group" @click="showHotWater" v-if="formatItemsList[12].abilityId && formatItemsList[12].showStatus">
           <div class="icon hot-water"></div>
           <!-- 热水 -->
           <div class="text">热水</div>
         </div>
-        <div class="but-group" @click="switchMode('1')" v-if="currMode ==='1'">
-          <div class="icon zhileng"></div>
+        <div class="but-group" @click="switchMode('1')" v-if="currMode ==='8'">
+          <div class="icon zhileng"  ></div>
           <div class="text">制冷</div>
         </div>
-        <div class="but-group" @click="switchMode('8')" v-if="currMode ==='8'">
+        <div class="but-group" @click="switchMode('8')" v-if="currMode ==='1'">
           <div class="icon gongnuan"></div>
+          <div class="text">供暖</div>
+        </div>
+      </div>
+
+      <div class="but-list" v-else>
+        <div class="but-group" @click="showWater">
+          <div class="icon water-temp"></div>
+          <!-- 水温 -->
+          <div class="text">水温</div>
+        </div>
+        <div class="but-group" @click="showBreakdown"  v-if="breakdownList.length===0">
+          <div class="icon successs"></div>
+          <!-- 故障 -->
+          <div class="text">正常</div>
+        </div>
+        <div class="but-group" @click="showBreakdown" v-else>
+          <div class="icon breakdown"></div>
+          <!-- 故障 -->
+          <div class="text">故障</div>
+        </div>
+        
+        <div class="but-group" @click="showHotWater" v-if="formatItemsList[12].abilityId && formatItemsList[12].showStatus">
+          <div class="icon hot-water"></div>
+          <!-- 热水 -->
+          <div class="text">热水</div>
+        </div>
+        <div class="but-group" @click="switchMode('1')" >
+          <div class="icon " :class="currMode ==='1'? 'zhileng1':'zhileng'"></div>
+          <div class="text">制冷</div>
+        </div>
+        <div class="but-group" @click="switchMode('8')">
+          <div class="icon " :class="currMode ==='8'? 'gongnuan1':'gongnuan'"></div>
           <div class="text">供暖</div>
         </div>
       </div>
@@ -103,7 +142,19 @@
         </div>
       </div>
     </yd-popup>
-
+    <yd-popup v-model="functionFlag" position="bottom" width="90%">
+      <div class="content">
+        <div class="title">功能设定</div>
+        <div class="list">
+          <ul v-if='formatItemsList[9] && formatItemsList[9].abilityId'>
+            <li v-if='item && item.status !== 2' v-for="item in getListData(formatItemsList[9].abilityId,'func')" :class="{ active: item.isChecked}" @click="nodeClicked(item,'',3)" :key='item.abilityId'>
+              <span>{{ item.definedName || item.abilityName }}</span>
+              <div class="icon"></div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </yd-popup>
     <!-- 水温 -->
     <yd-popup v-model="waterTempFlag" position="bottom" width="90%">
       <div class="content">
@@ -114,20 +165,26 @@
               <p class="desc">设定回水温度</p>
             </div>
           </div>
-          <div class="block">
-            <span class="min">0°</span>
-            <el-slider class="water-slider" v-model="waterTemp" :min="0" :max="60" :show-tooltip="false" @change="handleChangeWaterSlider"></el-slider>
-            <span class="max">60°</span>
+          <div class="block" v-if="currMode == 1">
+            <span class="min">8°</span>
+            <el-slider class="water-slider" v-model="waterTemp" :min="8" :max="25" :show-tooltip="false" @change="handleChangeWaterSlider"></el-slider>
+            <span class="max">25°</span>
+          </div>
+          <div class="block" v-if="currMode == 8">
+            <span class="min">25°</span>
+            <el-slider class="water-slider" v-model="waterTemp" :min="25" :max="50" :show-tooltip="false" @change="handleChangeWaterSlider"></el-slider>
+            <span class="max">50°</span>
           </div>
           <div class="card-panel">
             <div class="card">
-              <p class="num">{{waterTemp1}}°</p>
-              <p class="desc">供水温度</p>
+              <p class="num">{{waterTemp2}}°</p>
+              <p class="desc">用测回水</p>
             </div>
             <div class="card">
-              <p class="num">{{waterTemp2}}°</p>
-              <p class="desc">回水温度</p>
+              <p class="num">{{waterTemp1}}°</p>
+              <p class="desc">源侧供水</p>
             </div>
+            
           </div>
         </div>
       </div>
@@ -153,7 +210,8 @@ import {
   newQueryDetailByDeviceId,
   getLocation,
   getWeather,
-  sendFunc
+  sendFunc,
+  getFuncResult
 } from "../wenkong/api.js";
 
 let prevValues = '' //当一次用户选择的picker组件的第二个值，来判断。只有此值变化，才调用指令接口
@@ -169,6 +227,7 @@ export default {
       sunnyNight: img3, // 夜晚晴
       pageIsShow: false,
       img: img4,
+      functionFlag:false,
       customerName: "",
       cHeight: 200,
       isOpen: true, // 开关
@@ -180,6 +239,7 @@ export default {
       functionData: [],
       formatItemsList: [],
       abilitysList: [],
+      deviceName:'',
       location: "",
       weather: "", //天气
       outerTem: "", // 温度
@@ -278,6 +338,60 @@ export default {
     }
   },
   methods: {
+    guid2 (){
+        function S4() {
+            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        }
+        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4());
+    },
+    getFuncResult(val){
+          Toast({
+            mes: "设备操作成功",
+            timeout: 1000,
+            icon: "success"
+          });
+      // getFuncResult({value:val}).then(res=>{
+      //   if(res.data == "ok"){
+      //     Toast({
+      //       mes: "设备操作成功",
+      //       timeout: 1000,
+      //       icon: "success"
+      //     });
+      //   }else{
+      //     Toast({
+      //       mes: "设备操作失败",
+      //       timeout: 1000,
+      //       icon: "success"
+      //     });
+      //   }
+      // })
+    },
+    getListData (abilityId, which) {
+      // 说明是风速的abilityId，那么特殊情况，特殊处理
+      if (which === "left") {
+        return this.getListData(abilityId.split(",")[0]);
+      } else if (which === "right") {
+        return this.getListData(abilityId.split(",")[1]);
+      } else if (which === "func") {
+        return abilityId.split(",").map(id => {
+          return this.getAbilityData(id);
+        });
+      }
+
+      // 根据功能id获取功能项的数据
+      const result = this.abilitysList.filter(
+        item => item.abilityId == abilityId
+      )[0];
+      return result && result.abilityOptionList;
+    },
+    switchFunction () {
+      if (!this.isOpen) {
+        this.$toast("当前关机状态，不可操作", "bottom");
+        return false;
+      }
+
+      this.functionFlag = true;
+    },
     returnMethod () {
       this.$router.back(-1);
     },
@@ -294,13 +408,15 @@ export default {
       if (JSON.stringify(tempArray) === '{}') {
         return false;
       }
-
+      var uuid = this.guid2()
       sendFunc({
         deviceId: this.deviceId,
         funcId: tempArray.dirValue,
-        value: this.waterTemp
+        value: this.waterTemp,
+        funcNo:uuid
       }).then(res => {
         if (res.code === 200) {
+          this.getFuncResult(uuid)
           Toast({
             mes: "发送成功",
             timeout: 1000,
@@ -370,17 +486,25 @@ export default {
       let index = 0;
       if (this.isOpen) {
         // 找“关”的项
-        index = tempList.findIndex(item => item.dirValue === "0");
+        index = tempList.findIndex(item => item.optionValue === "0");
       } else {
-        index = tempList.findIndex(item => item.dirValue === "1");
+        index = tempList.findIndex(item => item.optionValue === "1");
       }
       Loading.close();
+      var uuid = this.guid2()
       sendFunc({
         deviceId: this.deviceId,
         funcId: tempArray.dirValue,
-        value: tempList[index].dirValue
+        value: tempList[index].dirValue,
+        funcNo:uuid
       }).then(res => {
+        this.getFuncResult(uuid)
         this.isOpen = !this.isOpen;
+        Toast({
+          mes: "指令发送成功",
+          timeout: 1000,
+          icon: "success"
+        });
         console.info(
           "指令发送成功:",
           tempArray.dirValue,
@@ -495,8 +619,12 @@ export default {
       const updateCurrData = () => {
         // 制冷、制热
         const data = this.abilitysList.find(item => item.abilityId == this.formatItemsList[9].abilityId);
-        this.currMode = data.currValue;
-
+        for(var i = 0; i < data.abilityOptionList.length;i++){
+          if(data.abilityOptionList[i].isSelect == 1){
+            this.currMode = data.abilityOptionList[i].dirValue
+          }
+        }
+        // this.currMode = data.currValue;
         let tempArray = {};
         if (this.currMode == '1') {
           tempArray = this.abilitysList.find(item => item.abilityId == this.formatItemsList[5].abilityId);
@@ -738,7 +866,7 @@ export default {
     }
     this.customerName = Store.fetch("customerName");
     setWechatTitle(this.customerName, "");
-
+    this.deviceName = Store.fetch("deviceName");
     this.getIndexAbilityData();
     this.getLocation();
     this.getWeather();
@@ -796,6 +924,10 @@ export default {
     span {
       color: #fff;
       font-size: tvw(83);
+      &:last-child{
+        font-size: tvw(88);
+        margin-top: 4px;
+      }
     }
   }
   .header {
@@ -926,7 +1058,7 @@ export default {
           }
           .line {
             border: 1px solid #dfdfdf;
-            margin: 0 tvw(166);
+            margin: 0 tvw(126);
           }
         }
       }
@@ -994,9 +1126,27 @@ export default {
               center;
             background-size: 38px 36px;
           }
+          &.zhileng1 {
+            background: url("../../assets/rebeng/zhileng1.png") no-repeat center
+              center;
+              border-color:#55ba8e; 
+            background-size: 38px 36px;
+          }
+          &.successs {
+            background: url("../../assets/rebeng/gouhao.png") no-repeat center
+              center;
+              border: none;
+            background-size: 38px 36px;
+          }
           &.gongnuan {
             background: url("../../assets/rebeng/gongnuan.png") no-repeat center
               center;
+            background-size: 38px 36px;
+          }
+          &.gongnuan1 {
+            background: url("../../assets/rebeng/gongnuan1.png") no-repeat center
+              center;
+              border-color:#eccc1e; 
             background-size: 38px 36px;
           }
           &.water-temp {
@@ -1007,6 +1157,7 @@ export default {
           &.breakdown {
             background: url("../../assets/rebeng/breakdown.png") no-repeat
               center center;
+              border-color:#eccc1e; 
             background-size: 38px 36px;
           }
           &.hot-water {

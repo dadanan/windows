@@ -648,6 +648,11 @@ export default {
         value: tempList[index].dirValue
       }).then(res => {
         this.isOpen = !this.isOpen;
+        Toast({
+          mes: "指令发送成功",
+          timeout: 1000,
+          icon: "success"
+        });
         console.info(
           "指令发送成功:",
           tempArray.dirValue,

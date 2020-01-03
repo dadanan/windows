@@ -36,7 +36,7 @@
             PM2.5
             <span>{{AQI}}</span>
           </p>
-          <p v-if='formatItemsList[16] && formatItemsList[16].abilityId' :class="{ active:  isOpen === true}">{{getAbilityData(formatItemsList[16].abilityId).currValue}}</p>
+          <p v-if='formatItemsList[15] && formatItemsList[15].abilityId' :class="{ active:  isOpen === true}">{{getAbilityData(formatItemsList[15].abilityId).currValue}}</p>
           <p></p>
           <p>ug/m3</p>
         </div>
@@ -80,6 +80,10 @@
         <div class="icon time"></div>
         <!-- 定时 -->
         <div class="text">{{formatItemsList[0].showName}}</div>
+      </div>
+      <div class="but-group"  v-if='(formatItemsList[17] && formatItemsList[17].showStatus) ||  (formatItemsList[18] && formatItemsList[18].showStatus)' @click='modelClickedHandler(formatItemsList[0] && formatItemsList[0].abilityId,0)'>
+        <div class="icon sheding"></div>
+        <div class="text">设定</div>
       </div>
       <div class="but-group" @click="switchModel(formatItemsList[1].abilityId)" v-if='formatItemsList[1] && formatItemsList[1].showStatus'>
         <div class="icon model"></div>
@@ -138,10 +142,41 @@
           </div>
         </div>
       </div>
+      <!-- 设定项 -->
+    </yd-popup>
+    <yd-popup v-model="temperatureVisible" position="bottom" width="90%">
+      <div class="content">
+        <div class="title">
+          <span>设定数值</span>
+          <span @click='confirmSetting'>确定</span>
+        </div>
+        <div class="list">
+          <div class='inside' style="padding:10px 20px;">
+            <div style="padding:10px 0px;" v-if="formatItemsList[17] && formatItemsList[17].showStatus">
+              <span class='info'> 湿度 &nbsp;&nbsp;</span>
+              <img @click='reduceTem' src='@/assets/reduce.png' style="width:20px;">
+              <div style="width:90px;height:38px;line-height:38px;font-size:18px;margin:0px 20px">
+                <span class='number'>{{temNumber}}</span>
+                <span class='icon'>%</span>
+              </div>
+              <img @click='increaseTem' src='@/assets/add.png' style="width:20px;">
+            </div>
+            <div style="padding:10px 0px;" v-if="formatItemsList[18] && formatItemsList[18].showStatus">
+              <span class='info'>PM2.5</span>
+              <img @click='reduceHum' src='@/assets/reduce.png' style="width:20px;">
+              <div style="width:90px;height:38px;line-height:38px;font-size:18px;margin:0px 20px">
+                <span class='number'>{{humNumber}}</span>
+                <span class='icon'></span>
+              </div>
+              <img @click='increaseHum' src='@/assets/add.png' style="width:20px;">
+            </div>
+          </div>
+        </div>
+      </div>
     </yd-popup>
     <yd-popup v-model="functionFlag" position="bottom" width="90%">
       <div class="content">
-        <div class="title">其它功能设定</div>
+        <div class="title">功能设定</div>
         <div class="list">
           <ul v-if='formatItemsList[3] && formatItemsList[3].abilityId'>
             <li v-if='item && item.status !== 2' v-for="item in getListData(formatItemsList[3].abilityId,'func')" :class="{ active: item.isChecked}" @click="nodeClicked(item,'',3)" :key='item.abilityId'>
@@ -177,7 +212,8 @@ import {
   getLocation,
   getWeather,
   sendFunc,
-  getStrainerData
+  getStrainerData,
+  getFuncResult
 } from "../wenkong/api";
 
 let prevValues = '' //当一次用户选择的picker组件的第二个值，来判断。只有此值变化，才调用指令接口
@@ -204,6 +240,7 @@ export default {
       isLock: false, // 童锁
       isSleep: false, // 睡眠
       modeFlag: false, // 模式设置
+      temperatureVisible: false, // 显示温度设定弹框
       deviceObj: {},
       modeCurrent: undefined,
       currentSpeedLeftIndexLabel: "", // 送风风速当前档位
@@ -231,7 +268,11 @@ export default {
       dirValueList: [],
       batteryList3: "",
       setInter2: undefined,
-      AQI: "优"
+      AQI: "优",
+      temNumber:0,
+      humNumber:0,
+      hasSet: false // 保证一些数据每次进入页面只刷新一次。
+
     };
   },
   computed: {
@@ -335,6 +376,89 @@ export default {
     }
   },
   methods: {
+     guid2 (){
+        function S4() {
+            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        }
+        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4());
+    },
+    getFuncResult(val){
+        Toast({
+          mes: "设备操作成功",
+          timeout: 1000,
+          icon: "success"
+        });
+      // getFuncResult({value:val}).then(res=>{
+      //   if(res.data == "ok"){
+      //     Toast({
+      //       mes: "设备操作成功",
+      //       timeout: 1000,
+      //       icon: "success"
+      //     });
+      //   }else{
+      //     Toast({
+      //       mes: "设备操作失败",
+      //       timeout: 1000,
+      //       icon: "success"
+      //     });
+      //   }
+        
+      // })
+    },
+    confirmSetting () {
+      var uuid = this.guid2()
+      this.sendFuncs("CSSD", this.temNumber,uuid);
+      this.sendFuncs("2DF0", this.humNumber,uuid);
+      this.temperatureVisible = false;
+    },
+    sendFuncs (funcId, value, uuid) {
+      // 发送指令
+      sendFunc({
+        deviceId: this.deviceId,
+        funcId: funcId,
+        value: value,
+        funcNo:uuid
+      }).then(() => {
+        this.getFuncResult(uuid)
+        Toast({
+          mes: "指令发送成功",
+          timeout: 1000,
+          icon: "success"
+        });
+        console.info("指令发送成功:", funcId, "-", value);
+      });
+    },
+    modelClickedHandler (index) {
+      if (!this.isOpen) {
+        this.$toast("当前关机状态，不可操作", "bottom");
+        return;
+      }
+
+      if (index == 0) {
+        // 如果用户唤起温度框
+        this.temperatureVisible = true;
+        return;
+      }
+    },
+    increaseTem () {
+      this.temNumber += 1;
+    },
+    reduceTem () {
+      if (this.temNumber <= 0) {
+        return;
+      }
+      this.temNumber -= 1;
+    },
+
+    increaseHum () {
+      this.humNumber += 1;
+    },
+    reduceHum () {
+      if (this.humNumber <= 0) {
+        return;
+      }
+      this.humNumber -= 1;
+    },
     /**
      * 开启回风风机？
      */
@@ -391,12 +515,14 @@ export default {
 
       this.currentSpeedLeftIndexLabel =
         option[index].optionDefinedName || option[index].optionName;
-
+      var uuid = this.guid2()
       sendFunc({
         deviceId: this.deviceId,
         funcId: data.dirValue,
-        value: option[index].optionValue
+        value: option[index].optionValue,
+        funcNo:uuid
       }).then(() => {
+        this.getFuncResult(uuid)
         Toast({
           mes: "指令发送成功！",
           timeout: 1000,
@@ -430,12 +556,14 @@ export default {
 
       this.currentSpeedRightIndexLabel =
         option[index].optionDefinedName || option[index].optionName;
-
+      var uuid = this.guid2()
       sendFunc({
         deviceId: this.deviceId,
         funcId: data.dirValue,
-        value: option[index].optionValue
+        value: option[index].optionValue,
+        funcNo:uuid
       }).then(() => {
+        this.getFuncResult(uuid)
         Toast({
           mes: "指令发送成功！",
           timeout: 1000,
@@ -450,12 +578,15 @@ export default {
       });
     },
     changeSleepStatus () {
+      var uuid = this.guid2()
       this.isSleep = false;
       sendFunc({
         deviceId: this.deviceId,
         funcId: "210",
-        value: "3"
+        value: "3",
+        funcNo:uuid
       }).then(() => {
+        this.getFuncResult(uuid)
         Toast({
           mes: "指令发送成功！",
           timeout: 1000,
@@ -697,13 +828,15 @@ export default {
       } else {
         index = tempList.findIndex(item => item.dirValue === "1");
       }
-
+      var uuid = this.guid2()
       sendFunc({
         deviceId: this.deviceId,
         funcId: tempArray.dirValue,
-        value: tempList[index].dirValue
+        value: tempList[index].dirValue,
+        funcNo:uuid
       }).then(res => {
         this.isLock = !this.isLock;
+        this.getFuncResult(uuid)
         Toast({
           mes: "指令发送成功！",
           timeout: 1000,
@@ -725,33 +858,47 @@ export default {
       const tempList = tempArray.abilityOptionList;
       let index = 0;
       let tempd = tempArray.dirValue;
+      
       if (this.isOpen) {
         // 找“关”的项
-        index = tempList.findIndex(item => item.dirValue === "0");
-        this.offopen(tempd, tempList[index].dirValue);
+        index = tempList.findIndex(item => item.optionValue === "0");
+        console.log(tempList)
+        this.offopen(tempd, tempList[index].optionValue);
       } else {
-        index = tempList.findIndex(item => item.dirValue === "1");
+        index = tempList.findIndex(item => item.optionValue === "1");
       }
+        // console.log(tempList[index].optionValue)
       Loading.close();
+      var uuid = this.guid2()
+      this.getFuncResult(uuid)
       sendFunc({
         deviceId: this.deviceId,
         funcId: tempArray.dirValue,
-        value: tempList[index].dirValue
+        value: tempList[index].optionValue,
+        funcNo:uuid
       }).then(res => {
         this.isOpen = !this.isOpen;
+        Toast({
+          mes: "指令发送成功",
+          timeout: 1000,
+          icon: "success"
+        });
         console.info(
           "指令发送成功:",
           tempArray.dirValue,
           "-",
-          tempList[index].dirValue
+          tempList[index].optionValue
         );
       });
     },
     offopen (DirValue, Dirindex) {
+      var uuid = this.guid2()
+      this.getFuncResult(uuid)
       sendFunc({
         deviceId: this.deviceId,
         funcId: DirValue,
-        value: Dirindex
+        value: Dirindex,
+        funcNo:uuid
       }).then(res => {
         console.info("指令发送成功:", "-", Dirindex);
       });
@@ -766,12 +913,15 @@ export default {
     sendFunc (item, index, type, cb) {
       // 模式、风速、功能的指令发送函数
       // Loading.open('发送中...')
+      var uuid = this.guid2()
       sendFunc({
         deviceId: this.deviceId,
         funcId: item.dirValue,
-        value: type === 3 ? index : item.abilityOptionList[index].optionValue
+        value: type === 3 ? index : item.abilityOptionList[index].optionValue,
+        funcNo:uuid
       })
         .then(res => {
+          this.getFuncResult(uuid)
           if (type === 1) {
             this.modeCurrent = index;
           } else if (type === 2) {
@@ -921,13 +1071,51 @@ export default {
         this.switchHandler();
         if (this.isOpen) {
           this.setPopDialogData();
+          
         }
         // 获取列表最后一项：空气质量，的值
         const lastItem = data[data.length - 1];
         if (lastItem.abilityName === "空气质量") {
           this.AQI = lastItem.currValue;
         }
+        this.setTemperature();
       });
+    },
+    setTemperature () {
+      // 保证每次进入页面只初始化一次。不随newQuery接口定时刷新
+      if (this.hasSet) {
+        return;
+      }
+
+      // 动态初始化环境设置的温度、湿度数值
+      if (
+        !this.formatItemsList[0] ||
+        !this.formatItemsList[0].showStatus ||
+        !this.formatItemsList[0].abilityId
+      ) {
+        return;
+      }
+
+      const ablityId = this.formatItemsList[17].abilityId.split(",");
+      const ablityIds = this.formatItemsList[18].abilityId.split(",");
+
+      ablityId.forEach(id => {
+        const ability = this.getAbilityData(id);
+        // 设置温度的数值
+        if (ability.dirValue === "CSSD") {
+          // console.log(this.temNumber)
+          this.temNumber = Number(ability.currValue);
+        }
+      });
+      ablityIds.forEach(id => {
+        const ability = this.getAbilityData(id);
+
+        // 设置湿度的数值
+        if (ability.dirValue === "2DF0") {
+          this.humNumber = Number(ability.currValue);
+        }
+      });
+      this.hasSet = true;
     },
     setWeather () {
       // 当前天气模式
@@ -1017,11 +1205,15 @@ export default {
       )[0].abilityOptionList;
 
       // 找到关机的对象
+      // console.log(this.abilitysList)
       const tempObj = tempArray[0].dirValue == 0 ? tempArray[0] : tempArray[1];
+      console.log(tempArray)
       if (tempObj.isSelect === 1) {
         // 说明是关机
+        // console.log(1)
         this.isOpen = false;
       } else {
+        // console.log(2)
         this.isOpen = true;
       }
 
@@ -1207,6 +1399,72 @@ export default {
       background-size: 20px 20px;
     }
   }
+  // .content {
+  //   padding: 20px 15px 20px 15px;
+  //   color: #4d4d4d;
+  //   background: #f0f0f0;
+  //   .title {
+  //     font-size: 16px;
+  //     padding-bottom: 10px;
+  //     border-bottom: 1px solid #dfdfdf;
+  //   }
+  //   .list {
+  //     & ul li {
+  //       font-size: 14px;
+  //       margin-top: 20px;
+  //       .icon {
+  //         float: right;
+  //         margin-right: 5px;
+  //         width: 20px;
+  //         height: 20px;
+  //         border: 1px solid #a3a3a3;
+  //         border-radius: 100%;
+  //       }
+  //       &.active {
+  //         .icon {
+  //           background: url("../../assets/select.png") no-repeat center center;
+  //           background-size: 20px 20px;
+  //           border: none;
+  //         }
+  //       }
+  //     }
+  //   }
+  //   .spec {
+  //     padding-left: 10px;
+  //     padding-right: 10px;
+  //     & ul li {
+  //       &.active {
+  //         color: #000;
+  //         background: url("../../assets/left.png") no-repeat center right 60%;
+  //         background-size: 20px 15px;
+  //       }
+  //     }
+  //   }
+  //   .wind-speed-list {
+  //     display: flex;
+  //     justify-content: space-between;
+  //     flex-direction: column;
+  //     align-items: center;
+  //     margin-top: 20px;
+  //     > div {
+  //       display: flex;
+  //       align-items: center;
+  //       width: 90%;
+  //       flex-direction: column;
+  //       > div,
+  //       > p {
+  //         width: 90%;
+  //       }
+  //       > p {
+  //         display: flex;
+  //         justify-content: space-between;
+  //       }
+  //     }
+  //     > div:nth-child(1) {
+  //       margin-bottom: 20px;
+  //     }
+  //   }
+  // }
   .content {
     padding: 20px 15px 20px 15px;
     color: #4d4d4d;
@@ -1215,6 +1473,9 @@ export default {
       font-size: 16px;
       padding-bottom: 10px;
       border-bottom: 1px solid #dfdfdf;
+      span:last-child {
+        float: right;
+      }
     }
     .list {
       & ul li {
@@ -1236,40 +1497,55 @@ export default {
           }
         }
       }
-    }
-    .spec {
-      padding-left: 10px;
-      padding-right: 10px;
-      & ul li {
-        &.active {
-          color: #000;
-          background: url("../../assets/left.png") no-repeat center right 60%;
-          background-size: 20px 15px;
-        }
-      }
-    }
-    .wind-speed-list {
-      display: flex;
-      justify-content: space-between;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 20px;
-      > div {
-        display: flex;
-        align-items: center;
-        width: 90%;
-        flex-direction: column;
-        > div,
-        > p {
-          width: 90%;
-        }
-        > p {
+      .inside {
+        > div {
+          width: fit-content;
           display: flex;
-          justify-content: space-between;
+          align-items: center;
+          margin: tvw(300) auto tvw(100) auto;
+          > div {
+            margin: auto tvw(205);
+            width: tvw(605);
+            height: tvw(255);
+            background-image: url("~@/assets/small_background.png");
+            background-size: cover;
+            background-repeat: no-repeat;
+            line-height: tvw(255);
+            text-align: center;
+            color: #fff;
+            span.number {
+              font-size: tvw(150);
+            }
+            span.icon {
+              font-size: tvw(17);
+            }
+          }
+          img {
+            width: tvw(141);
+            height: tvw(141);
+          }
+          .info {
+            margin: 0;
+            margin-right: 30px;
+            color: grey;
+          }
         }
       }
-      > div:nth-child(1) {
-        margin-bottom: 20px;
+    }
+    .wind-speed {
+      display: flex;
+      align-items: center;
+      width: 90%;
+      flex-direction: column;
+      margin: auto;
+      margin-top: 20px;
+      > div,
+      > p {
+        width: 90%;
+      }
+      > p {
+        display: flex;
+        justify-content: space-between;
       }
     }
   }
@@ -1420,6 +1696,10 @@ export default {
         &.shan {
           background: url("../../assets/shan.png") no-repeat center top 6px;
           background-size: 22px 20px;
+        }
+        &.sheding {
+          background: url("../../assets/temperature.png") no-repeat center top 6px;
+          background-size: 12px 20px;
         }
         &.menu {
           background: url("../../assets/menu.png") no-repeat center center;

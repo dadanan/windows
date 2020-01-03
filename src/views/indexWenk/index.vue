@@ -202,7 +202,8 @@ import {
   getLocation,
   getWeather,
   sendFunc,
-  getPageDatas
+  getPageDatas,
+  getFuncResult
 } from "../wenkong/api";
 import Store from "../wenkong/store";
 import img1 from "../../assets/bak3.jpg"; // 白天阴
@@ -267,6 +268,35 @@ export default {
     };
   },
   methods: {
+    guid2 (){
+        function S4() {
+            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        }
+        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4());
+    },
+    getFuncResult(val){
+          Toast({
+            mes: "设备操作成功",
+            timeout: 1000,
+            icon: "success"
+          });
+      // getFuncResult({value:val}).then(res=>{
+      //   if(res.data == "ok"){
+      //     Toast({
+      //       mes: "设备操作成功",
+      //       timeout: 1000,
+      //       icon: "success"
+      //     });
+      //   }else{
+      //     Toast({
+      //       mes: "设备操作失败",
+      //       timeout: 1000,
+      //       icon: "success"
+      //     });
+      //   }
+        
+      // })
+    },
     /**
      * 用户配置了打开了次级模式并且配置了数据?
      */
@@ -319,12 +349,14 @@ export default {
 
       this.currentSpeedIndexLabel =
         option[index].optionDefinedName || option[index].optionName;
-
+      var uuid = this.guid2()
       sendFunc({
         deviceId: this.deviceId,
         funcId: data.dirValue,
-        value: option[index].optionValue
+        value: option[index].optionValue,
+        funcNo:uuid
       }).then(() => {
+        this.getFuncResult(uuid)
         Toast({
           mes: "指令发送成功！",
           timeout: 1000,
@@ -422,17 +454,24 @@ export default {
       let index = 0;
       if (this.isOpen) {
         // 找“关”的项
-        index = tempList.findIndex(item => item.dirValue == "0");
+        index = tempList.findIndex(item => item.optionValue == "0");
       } else {
-        index = tempList.findIndex(item => item.dirValue == "1");
+        index = tempList.findIndex(item => item.optionValue == "1");
       }
-
+      var uuid = this.guid2()
       sendFunc({
         deviceId: this.deviceId,
         funcId: tempArray.dirValue,
-        value: tempList[index].dirValue
+        value: tempList[index].optionValue,
+        funcNo:uuid
       }).then(res => {
         this.isOpen = !this.isOpen;
+        this.getFuncResult(uuid)
+        Toast({
+          mes: "指令发送成功",
+          timeout: 1000,
+          icon: "success"
+        });
         console.info(
           "指令发送成功:",
           tempArray.dirValue,
@@ -740,6 +779,10 @@ export default {
     span {
       color: #fff;
       font-size: tvw(83);
+      &:last-child{
+        font-size: tvw(88);
+        margin-top: 4px;
+      }
     }
     img {
       width: 12px;

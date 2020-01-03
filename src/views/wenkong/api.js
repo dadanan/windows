@@ -569,3 +569,14 @@ export function helpFiles(data) {
   }
   })
 }
+
+//查询接口
+export function getFuncResult(data) {
+  return http({
+    url: `${BASE_URL}/api/h5/api/getFuncResult`,
+    method: 'post',
+    data,
+    headers: { Ticket: Store.fetch('Ticket')
+  }
+  })
+}

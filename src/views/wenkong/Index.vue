@@ -7,19 +7,24 @@
     </div>
     <div class='info'>
       <img src="../../assets/map.png" />&nbsp;
-      <span v-show='formatItemsList[9] && formatItemsList[9].showStatus'>{{location}}&nbsp;</span>
+      <!-- <span v-show='formatItemsList[9] && formatItemsList[9].showStatus'>{{location}}&nbsp;</span>
       <span v-show='formatItemsList[10] && formatItemsList[10].showStatus'>{{weather}} {{outerTem}}&nbsp;</span>
       <span v-if='formatItemsList[11] && formatItemsList[11].showStatus'>湿度: {{outerHum}}%&nbsp;</span>
-      <span v-show='formatItemsList[12] && formatItemsList[12].showStatus'>PM2.5: {{outerPm}}ug/m3</span>
+      <span v-show='formatItemsList[12] && formatItemsList[12].showStatus'>PM2.5: {{outerPm}}ug/m3</span> -->
+      <span>{{location}}&nbsp;</span>
+      <span>{{weather}} {{outerTem}}&nbsp;</span>
+      <span>湿度: {{outerHum}}&nbsp;</span>
+      <span>PM2.5: {{outerPm}}ug/m3</span>
     </div>
     <div class='switch'>
-      <div v-show='formatItemsList[7] && formatItemsList[7].showStatus && formatItemsList[7].abilityId'>
+      <!-- <div v-show='formatItemsList[7] && formatItemsList[7].showStatus && formatItemsList[7].abilityId'>
         <div class='left'>
           <img src='@/assets/wenkong/host-status-open.png' v-if='hostIsOpen()'>
           <img src='@/assets/wenkong/host-status-close.png' v-else>
         </div>
         <p>{{formatItemsList[7] && formatItemsList[7].showName}}</p>
-      </div>
+      </div> -->
+      <div></div>
       <div v-show='formatItemsList[8] && formatItemsList[8].showStatus' @click='onOffMethod'>
         <div>
           <img src='@/assets/wenkong_close.png' v-if='isOpen'>
@@ -32,7 +37,7 @@
       <div>
         <h3>设定值</h3>
         <h1>{{temNumber}}</h1>
-        <h3 class='last'>℃</h3>
+        <h3 class='last'>{{unit}}</h3>
       </div>
     </div>
     <div class='current-info'>
@@ -90,14 +95,14 @@
         <span>{{modeCurrentLabel}}</span>
       </div>
     </div>
-    <div class='right-side'>
+    <!-- <div class='right-side'>
       <img v-if='functionIcon.isFloorHot' src='@/assets/wenkong/floor-hot.png'>
       <img v-if='functionIcon.isAirConditioning' src='@/assets/wenkong/air-conditioning.png'>
       <img v-if='functionIcon.isAuxiliaryHot' src='@/assets/wenkong/auxiliary-hot.png'>
       <img v-if='functionIcon.isTopCold' src='@/assets/wenkong/top-cold.png'>
       <img v-if='functionIcon.isTopHot' src='@/assets/wenkong/top-hot.png'>
       <img v-if='functionIcon.isVentilation' src='@/assets/wenkong/ventilation.png'>
-    </div>
+    </div> -->
     <!-- 模式 -->
     <yd-popup v-model="modelVisible" position="bottom" width="90%">
       <div class="content">
@@ -137,11 +142,11 @@
         <div class="list">
           <div class='inside'>
             <div>
-              <span class='info'>温度</span>
+              <span class='info'>{{formatItemsList[0].showName}}</span>
               <img @click='reduceTem' src='@/assets/reduce.png'>
               <div>
                 <span class='number'>{{temNumber}}</span>
-                <span class='icon'>℃</span>
+                <span class='icon'>{{unit}}</span>
               </div>
               <img @click='increaseTem' src='@/assets/add.png'>
             </div>
@@ -172,7 +177,8 @@ import {
   newQueryDetailByDeviceId,
   getLocation,
   getWeather,
-  sendFunc
+  sendFunc,
+  getFuncResult
 } from "./api";
 import Store from "./store";
 import img1 from "../../assets/bak3.jpg"; // 白天阴
@@ -202,7 +208,7 @@ export default {
       modelVisible: false,
       windVisible: false,
       pageIsShow: false,
-      temNumber: 26, // 客户设定温度
+      temNumber: 0, // 客户设定温度
       humNumber: 45, // 客户设定湿度
       temperatureVisible: false, // 显示温度设定弹框
       currentOptionForWind: 0, // 风速的当前选择项
@@ -241,6 +247,7 @@ export default {
         isTopHot: false,
         isVentilation: false
       },
+      unit:'℃',
       hasSet: false // 保证一些数据每次进入页面只刷新一次。
     };
   },
@@ -276,6 +283,34 @@ export default {
     }
   },
   methods: {
+     guid2 (){
+        function S4() {
+            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        }
+        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4());
+    },
+    getFuncResult(val){
+          Toast({
+            mes: "设备操作成功",
+            timeout: 1000,
+            icon: "success"
+          });
+      // getFuncResult({value:val}).then(res=>{
+      //   if(res.data == "ok"){
+      //     Toast({
+      //       mes: "设备操作成功",
+      //       timeout: 1000,
+      //       icon: "success"
+      //     });
+      //   }else{
+      //     Toast({
+      //       mes: "设备操作失败",
+      //       timeout: 1000,
+      //       icon: "success"
+      //     });
+      //   }
+      // })
+    },
     /**
      * 温控器的主机，目前正在开机状态
      * 如果用户选择了‘主机状态功能项’，获取它的主机的‘主机状态功能项’的值
@@ -313,17 +348,19 @@ export default {
       return true;
     },
     modeClicked (index) {
+
       const data = this.getAbilityData(this.formatItemsList[1].abilityId);
       if (!data) {
         return;
       }
+      console.log(data)
       const option = data.abilityOptionList;
       let value = option[index].optionValue;
       // 如果是致热模式，默认打开选项值为6的次级模式
       if (value == "4") {
         this.setIconVisible(["isFloorHot"]);
         if (this.hasOptionalFunction()) {
-          value = 41;
+          value = 4; //41   不知为何是41  以前的指令为41
         }
       }
       this.sendFunc(data.dirValue, value, () => {
@@ -344,12 +381,14 @@ export default {
 
       this.currentSpeedIndexLabel =
         option[index].optionDefinedName || option[index].optionName;
-
+      var uuid = this.guid2()
       sendFunc({
         deviceId: this.deviceId,
         funcId: data.dirValue,
-        value: option[index].optionValue
+        value: option[index].optionValue,
+        funcNo:uuid
       }).then(() => {
+        this.getFuncResult(uuid)
         Toast({
           mes: "指令发送成功！",
           timeout: 1000,
@@ -376,6 +415,7 @@ export default {
       if (this.hasSet) {
         return;
       }
+
       // 动态初始化环境设置的温度、湿度数值
       if (
         !this.formatItemsList[0] ||
@@ -386,12 +426,13 @@ export default {
       }
 
       const ablityId = this.formatItemsList[0].abilityId.split(",");
-
       ablityId.forEach(id => {
         const ability = this.getAbilityData(id);
         // 设置温度的数值
         if (ability.dirValue === "2DD.0") {
           this.temNumber = Number(ability.currValue);
+          console.log(ablityId,1)
+
         }
 
         // 设置湿度的数值
@@ -402,6 +443,9 @@ export default {
       this.hasSet = true;
     },
     switchHandler () {
+      if(this.formatItemsList[0].showName.indexOf("湿度")>=0){
+          this.unit = '%'
+        }
       // 开关机初始化
       const tempArray = this.abilitysList.filter(
         item => item.abilityId == this.formatItemsList[8].abilityId
@@ -447,17 +491,24 @@ export default {
       let index = 0;
       if (this.isOpen) {
         // 找“关”的项
-        index = tempList.findIndex(item => item.dirValue == "0");
+        index = tempList.findIndex(item => item.optionValue == "0");
       } else {
-        index = tempList.findIndex(item => item.dirValue == "1");
+        index = tempList.findIndex(item => item.optionValue == "1");
       }
-
+      var uuid = this.guid2()
       sendFunc({
         deviceId: this.deviceId,
         funcId: tempArray.dirValue,
-        value: tempList[index].dirValue
+        value: tempList[index].optionValue,
+        funcNo:uuid
       }).then(res => {
         this.isOpen = !this.isOpen;
+        this.getFuncResult(uuid)
+        Toast({
+          mes: "指令发送成功",
+          timeout: 1000,
+          icon: "success"
+        });
         console.info(
           "指令发送成功:",
           tempArray.dirValue,
@@ -483,6 +534,9 @@ export default {
 
       if (index == 0) {
         // 如果用户唤起温度框
+        if(this.formatItemsList[0].showName.indexOf("湿度")>=0){
+          this.unit = '%'
+        }
         this.temperatureVisible = true;
         return;
       }
@@ -509,8 +563,9 @@ export default {
       this.humNumber -= 1;
     },
     confirmSetting () {
-      this.sendFunc("2DD.0", this.temNumber);
-      this.sendFunc("2DE.0", this.humNumber);
+      var uuid = this.guid2()
+      this.sendFuncd("2DD.0", this.temNumber,uuid);
+      // this.sendFunc("2DE.0", this.humNumber);
       this.temperatureVisible = false;
     },
     intoSet () {
@@ -547,7 +602,8 @@ export default {
       } else {
         this.currentOption = index;
       }
-      this.sendFunc(data.dirValue, data.abilityOptionList[index].dirValue);
+      var uuid = this.guid2()
+      this.sendFuncd(data.dirValue, data.abilityOptionList[index].dirValue,uuid);
     },
     sendFunc (funcId, value, cb) {
       // 发送指令
@@ -567,12 +623,31 @@ export default {
         console.info("指令发送成功:", funcId, "-", value);
       });
     },
+    sendFuncd (funcId, value, uuid) {
+      // 发送指令
+      sendFunc({
+        deviceId: this.deviceId,
+        funcId: funcId,
+        value: value,
+        funcNo:uuid
+      }).then(() => {
+        this.getFuncResult(uuid)
+        Toast({
+          mes: "指令发送成功",
+          timeout: 1000,
+          icon: "success"
+        });
+        console.info("指令发送成功:", funcId, "-", value);
+      });
+    },
     functionClicked (item) {
       if (!this.isOpen) {
         this.$toast("当前关机状态，不可操作", "bottom");
         return;
       }
-      this.sendFunc("210", item.optionValue, () => {
+      var uuid = this.guid2()
+      this.sendFuncd("210", item.optionValue,uuid, () => {
+        this.getFuncResult(uuid)
         Toast({
           mes: "指令发送成功",
           timeout: 1000,
@@ -626,7 +701,9 @@ export default {
         const data = res.data;
         // 将res.data中的isSelect和dirValue赋值过去
         this.abilitysList.forEach((item, index) => {
+          // console.log(item,index)
           // 如果有值，说明是温度功能项，讲数值拿过来
+          // console.log(data[index],data[index].currValue,2)
           if (data[index] && data[index].currValue) {
             // 找到对应的温度功能项对象
             const temp = this.abilitysList.filter(
@@ -636,6 +713,7 @@ export default {
               return;
             }
             try {
+              // console.log(data[index],6)
               temp.currValue = data[index].currValue;
             } catch (e) {
               // 怪异的错误，就算判断data[index]不为空，也会出现currValue of undefined错误～
@@ -676,13 +754,16 @@ export default {
         }
 
         // 根据isSelect的值，对相应选项执行默认选中行为
+        // console.log( modeData.abilityOptionList)
         modeData.abilityOptionList.forEach((item, iIndex) => {
+                    // console.log(item)
           if (item.isSelect == 0) {
             return;
           }
 
           // “模式选项”
           this.modeCurrent = iIndex;
+
           this.modeCurrentLabel = item.optionDefinedName || item.optionName;
 
           // 如果当前选中对模式是致热，打开次级功能模式
@@ -801,9 +882,8 @@ export default {
       return result && result.abilityOptionList;
     },
     getLocation () {
-      getLocation(this.masterDeviceId).then(res => {
+      getLocation(this.deviceId).then(res => {
          const data = res.data;
-
           // 取地址的省市区信息
           if (data.location) {
             let location = data.location.split(",");
@@ -1011,6 +1091,10 @@ export default {
     span {
       color: #fff;
       font-size: tvw(83);
+      &:last-child{
+        font-size: tvw(88);
+        margin-top: 4px;
+      }
     }
     img {
       width: 12px;

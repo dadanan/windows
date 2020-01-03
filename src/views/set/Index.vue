@@ -125,14 +125,14 @@
           <div class="cell-right"></div>
         </a>
       </div>
-      <div class="cell-item white" @click="ceshi">
+      <!-- <div class="cell-item white" @click="ceshi">
         <a>
           <div class="cell-left">
             <span>测试页面</span>
           </div>
           <div class="cell-right"></div>
         </a>
-      </div>
+      </div> -->
     </div>
     <!-- 保修反馈 -->
     <div class="create-dialog dialog" v-if="warranty">

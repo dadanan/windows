@@ -43,7 +43,16 @@ const AirCoolIndex = resolve => require(['@/views/indexAirCool/Index'], resolve)
 
 const VrvIndex = resolve => require(['@/views/vrv/Index'], resolve)
 
+const WnbIndex = resolve => require(['@/views/wnplate/Index'], resolve)
+
+const MixWater = resolve => require(['@/views/indexWater/Index'], resolve)
+
+const MixFsWater = resolve => require(['@/views/indexFsWater/Index'], resolve)
+
 const TeamShare = resolve => require(['@/views/set/teamShare'], resolve)
+
+const LeakingWater = resolve => require(['@/views/leakingWater/Index'], resolve)
+const Quality = resolve => require(['@/views/quality/Index'], resolve)
 const Ceshi = resolve => require(['@/views/set/ceshi'], resolve)
 let routes = [
   {
@@ -62,6 +71,41 @@ let routes = [
     component: TeamShare,
     meta: {
       title: '设备组分享'
+    }
+  },
+  {
+    path: '/leakingWater',
+    component: LeakingWater,
+    meta: {
+      title: ''
+    }
+  },
+  {
+    path: '/quality',
+    component: Quality,
+    meta: {
+      title: ''
+    }
+  },
+  {
+    path: '/mixWater',
+    component: MixWater,
+    meta: {
+      title: ''
+    }
+  },
+  {
+    path: '/mixFsWater',
+    component: MixFsWater,
+    meta: {
+      title: ''
+    }
+  },
+  {
+    path: '/wnbIndex',
+    component: WnbIndex,
+    meta: {
+      title: ''
     }
   },
   {

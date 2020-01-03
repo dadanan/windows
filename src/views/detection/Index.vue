@@ -10,7 +10,7 @@
       <span v-show='formatItemsList[9] && formatItemsList[9].showStatus'>{{location}}&nbsp;</span>
       <span v-show='formatItemsList[10] && formatItemsList[10].showStatus'>{{weather}} {{getOuterTem}}℃&nbsp;</span>
       <span v-show='formatItemsList[11] && formatItemsList[11].showStatus'>湿度: {{getOuterHum}}%&nbsp;</span>
-      <span v-show='formatItemsList[12] && formatItemsList[12].showStatus'>PM2.5: {{getOuterPM}}ug/m3&nbsp;</span>
+      <span v-show='formatItemsList[12] && formatItemsList[12].showStatus' >PM2.5: {{getOuterPM}}ug/m3&nbsp;</span>
       <span>质量: {{AQI}}</span>
     </div>
     <div class="but-list">
@@ -136,7 +136,8 @@ import {
   newQueryDetailByDeviceId,
   getLocation,
   getWeather,
-  sendFunc
+  sendFunc,
+  getFuncResult
 } from "../wenkong/api";
 
 export default {
@@ -258,6 +259,35 @@ export default {
     }
   },
   methods: {
+    guid2 (){
+        function S4() {
+            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        }
+        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4());
+    },
+    getFuncResult(val){
+        Toast({
+            mes: "设备操作成功",
+            timeout: 1000,
+            icon: "success"
+          });
+      // getFuncResult({value:val}).then(res=>{
+      //   if(res.data == "ok"){
+      //     Toast({
+      //       mes: "设备操作成功",
+      //       timeout: 1000,
+      //       icon: "success"
+      //     });
+      //   }else{
+      //     Toast({
+      //       mes: "设备操作失败",
+      //       timeout: 1000,
+      //       icon: "success"
+      //     });
+      //   }
+        
+      // })
+    },
     getAbilityByDirValue(dirValue) {
       // 根据指令值找对应的功能项数据，双风机风速用到
       return this.abilitysList.filter(item => item.dirValue === dirValue)[0];
@@ -333,13 +363,15 @@ export default {
       } else {
         index = tempList.findIndex(item => item.dirValue === "1");
       }
-
+      var uuid = this.guid2()
       sendFunc({
         deviceId: this.deviceId,
         funcId: tempArray.dirValue,
-        value: tempList[index].dirValue
+        value: tempList[index].dirValue,
+        funcNo:uuid
       }).then(res => {
         this.isLock = !this.isLock;
+        this.getFuncResult(uuid)
         Toast({
           mes: "指令发送成功！",
           timeout: 1000,
@@ -363,18 +395,26 @@ export default {
       let tempd = tempArray.dirValue;
       if (this.isOpen) {
         // 找“关”的项
-        index = tempList.findIndex(item => item.dirValue === "0");
-        this.offopen(tempd, tempList[index].dirValue);
+        index = tempList.findIndex(item => item.optionValue === "0");
+        this.offopen(tempd, tempList[index].optionValue);
       } else {
-        index = tempList.findIndex(item => item.dirValue === "1");
+        index = tempList.findIndex(item => item.optionValue === "1");
       }
       Loading.close();
+      var uuid = this.guid2()
       sendFunc({
         deviceId: this.deviceId,
         funcId: tempArray.dirValue,
-        value: tempList[index].dirValue
+        value: tempList[index].optionValue,
+        funcNo:uuid
       }).then(res => {
+        this.getFuncResult(uuid)
         this.isOpen = !this.isOpen;
+        Toast({
+          mes: "指令发送成功",
+          timeout: 1000,
+          icon: "success"
+        });
         console.info(
           "指令发送成功:",
           tempArray.dirValue,

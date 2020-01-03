@@ -47,7 +47,8 @@ import {
   newQueryDetailByDeviceId,
   getLocation,
   getWeather,
-  sendFunc
+  sendFunc,
+  getFuncResult
 } from "../wenkong/api.js";
 
 let prevValues = '' //当一次用户选择的picker组件的第二个值，来判断。只有此值变化，才调用指令接口
@@ -158,6 +159,30 @@ export default {
     }
   },
   methods: {
+    guid2 (){
+        function S4() {
+            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        }
+        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4());
+    },
+    getFuncResult(val){
+      getFuncResult({value:val}).then(res=>{
+        if(res.data == "ok"){
+          Toast({
+            mes: "设备操作成功",
+            timeout: 1000,
+            icon: "success"
+          });
+        }else{
+          Toast({
+            mes: "设备操作失败",
+            timeout: 1000,
+            icon: "success"
+          });
+        }
+        
+      })
+    },
     returnMethod () {
       this.$router.back(-1);
     },
@@ -241,17 +266,25 @@ export default {
       let index = 0;
       if (this.isOpen) {
         // 找“关”的项
-        index = tempList.findIndex(item => item.dirValue === "0");
+        index = tempList.findIndex(item => item.optionValue === "0");
       } else {
-        index = tempList.findIndex(item => item.dirValue === "1");
+        index = tempList.findIndex(item => item.optionValue === "1");
       }
       Loading.close();
+      var uuid = this.guid2()
       sendFunc({
         deviceId: this.deviceId,
         funcId: tempArray.dirValue,
-        value: tempList[index].dirValue
+        value: tempList[index].optionValue,
+        funcNo:uuid
       }).then(res => {
         this.isOpen = !this.isOpen;
+        this.getFuncResult(uuid)
+        Toast({
+          mes: "指令发送成功",
+          timeout: 1000,
+          icon: "success"
+        });
         console.info(
           "指令发送成功:",
           tempArray.dirValue,
@@ -493,12 +526,15 @@ export default {
         item => item.abilityId == this.formatItemsList[1].abilityId
       )[0];
       const tempList = tempArray.abilityOptionList;
+      var uuid = this.guid2()
       sendFunc({
         deviceId: this.deviceId,
         funcId: tempArray.dirValue,
-        value: index
+        value: index,
+        funcNo:uuid
       }).then(res => {
         if (res.code === 200) {
+          this.getFuncResult(uuid)
           Toast({
             mes: "发送成功",
             timeout: 1000,

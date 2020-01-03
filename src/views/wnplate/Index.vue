@@ -7,113 +7,139 @@
     </div>
     <div class="info">
       <img src="../../assets/map.png" style="width:12px;height:auto" />&nbsp;
-      <span>{{location}}&nbsp;</span>
-      <span>{{weather}} {{getOuterTem}}℃&nbsp;</span>
+      <span >{{location}}&nbsp;</span>
+      <span >{{weather}} {{outerPm}}℃&nbsp;</span>
       <span>湿度: {{getOuterHum}}%&nbsp;</span>
-      <span>PM2.5: {{getOuterPM}}ug/m3&nbsp;</span>
-      <!-- <span>质量: {{AQI}}</span> -->
+      <span >PM2.5: {{getOuterPM}}ug/m3&nbsp;</span>
+      <span>质量: {{AQI}}</span>
     </div>
     <div class="but-list">
       <!-- 童锁 -->
-      <div class="but-group">
-        <!-- <div class="icon suo" @click="childMethod"></div>
-        <div class="text" @click="childMethod">群控开关</div> -->
+      <div class="but-group" v-if='formatItemsList[10] && formatItemsList[10].showStatus'>
+        <!-- <div class="icon suo"></div> -->
+        <!-- <div class="text" @click="childMethod">{{formatItemsList[10].showName}}</div> -->
+      </div>
+      <div class="but-group" v-if="1===2">
+        <div class="icon shop"> </div>
+        <div class="text">商城</div>
       </div>
       <!-- 开关 -->
-      <div class="but-group">
+      <div class="but-group" v-if='formatItemsList[6] && formatItemsList[6].showStatus'>
         <div class="icon close" :class="{ active:isOpen === true  }" @click="onOffMethod"></div>
-        <div class="text" @click="onOffMethod">开关</div>
+        <div class="text" @click="onOffMethod">{{formatItemsList[6].showName}}</div>
       </div>
     </div>
     <div class="center">
       <div class="circle-data" :style="{ height:cHeight+'px' }">
         <div class="circle-inner">
           <p>
-            设定
-            <!-- <span>{{AQI}}</span> -->
+            PM2.5
+            <span>{{AQI}}</span>
           </p>
-          <p v-if='formatItemsList[1] && formatItemsList[1].abilityId' :class="{ active:  isOpen === true}">{{getAbilityData(formatItemsList[2].abilityId).currValue}}</p>
-          <!-- <p v-if='formatItemsList[6] && formatItemsList[6].abilityId' :class="{ active:  isOpen === true}">{{waterTemp}}</p> -->
-
+          <p v-if='formatItemsList[8] && formatItemsList[8].abilityId' :class="{ active:  isOpen === true}">{{getAbilityData(formatItemsList[8].abilityId).currValue}}</p>
           <p></p>
-          <p style="font-size:18px;">℃</p>
+          <p>ug/m3</p>
         </div>
-      </div>
-      <div class='current-info'>
-        <p v-if='formatItemsList[1] && formatItemsList[1].showStatus'>
-          {{formatItemsList[1] && formatItemsList[1].showName}}
-          <span class='strong'>{{((getAbilityData(formatItemsList[1].abilityId).currValue)/10) == 0 ? '0' : ((getAbilityData(formatItemsList[1].abilityId).currValue)/10)-50}}</span>
-          ℃
-        </p>
       </div>
       <div class="temper">
-        <div class="t1">
-          <p style="text-align:left;">
-            <img :src="shan" style="width:20px;">
-          </p>
-          <p style="text-align:right;">
-            <span style="font-size:16px">{{currentSpeedRightIndexLabel}}</span>
-          </p>
-        </div>
-        <div class="t1">
-          <p style="text-align:left;">
-            <img :src="ms" style="width:14px;">
-          </p>
-          <p style="text-align:right;">
-            <!-- 通风 -->
-            <span style="font-size:16px">{{model}}</span>
+        <div class="t1" v-if='formatItemsList[9] && formatItemsList[9].showStatus'>
+          <p>
+            <span>{{getAbilityData(formatItemsList[9].abilityId).currValue}}</span>℃</p>
+          <p>
+            <!-- 温度 -->
+            <span style="font-size:16px">{{formatItemsList[9].showName}}</span>
           </p>
         </div>
-        <div class="t1">
-          <p style="text-align:left;">
-            <img :src="ds" style="width:20px;">
-          </p>
-          <p style="text-align:right;">
-            <!-- 定时 -->
-            <span style="font-size:16px">关</span>
+        <div class="t2" v-if='formatItemsList[10] && formatItemsList[10].showStatus'>
+          <p>
+            <span>{{getAbilityData(formatItemsList[10].abilityId).currValue}}</span>%</p>
+          <p>
+            <!-- 湿度 -->
+            <span style="font-size:16px">{{formatItemsList[10].showName}}</span>
           </p>
         </div>
+      </div>
+      <!-- <div class="tip" v-show='formatItemsList[7] && formatItemsList[7].showStatus'>
+        <p>滤芯剩余寿命 {{batteryList3}} 时</p>
+        <p v-if="1===2">设备租赁剩余时间 2 时</p>
+      </div> -->
+      <div class="b-data">
+        <!-- 回风电机温度 -->
+        <span v-if='formatItemsList[14] && formatItemsList[14].showStatus'>{{formatItemsList[14].showName}}
+          <em>{{Number(getAbilityData(formatItemsList[14].abilityId).currValue)}}</em> ℃</span>
+        <!-- 送风电机温度 -->
+        <span v-if='formatItemsList[15] && formatItemsList[15].showStatus && getAbilityData(formatItemsList[15].abilityId)'>{{formatItemsList[15].showName}}
+          <em>{{Number(getAbilityData(formatItemsList[15].abilityId).currValue)}}</em>℃</span>
+      </div>
+      <div class="b-data">
+        <!-- CO2 -->
+        <span v-if='formatItemsList[11] && formatItemsList[11].showStatus'>{{formatItemsList[11].showName}}
+          <em>{{getAbilityData(formatItemsList[11].abilityId).currValue}}</em> PPM</span>
+        <!-- TVOC -->
+        <span v-if='formatItemsList[13] && formatItemsList[13].showStatus && getAbilityData(formatItemsList[13].abilityId)'>{{formatItemsList[13].showName}}
+          <em>{{Number(getAbilityData(formatItemsList[13].abilityId).currValue) / 100}}</em> mg/m³</span>
+        <span v-if='formatItemsList[12] && formatItemsList[12].showStatus'>{{formatItemsList[12].showName}}
+          <!-- 甲醛 -->
+          <em>{{Number(getAbilityData(formatItemsList[12].abilityId).currValue) / 100}}</em> mg/m³</span>
       </div>
     </div>
     <div class="but-list fixed">
-      
-      <div class="but-group" @click="switchSpeed(formatItemsList[2].abilityId)">
-        <div class="icon shan"></div>
-        <!-- 设定温度 -->
-        <div class="text">设定</div>
-      </div>
-      <div class="but-group" @click="switchFunction(formatItemsList[3].abilityId)">
-        <div class="icon menu"></div>
-        <!-- 风速 -->
-        <div class="text">风速</div>
-      </div>
-      <div class="but-group" @click="switchModel(formatItemsList[4].abilityId)">
+      <!-- <div class="but-group" @click="intiTime" v-if='formatItemsList[0] && formatItemsList[0].showStatus'>
+        <div class="icon time"></div> -->
+        <!-- 定时 -->
+        <!-- <div class="text">{{formatItemsList[0].showName}}</div>
+      </div> -->
+      <div class="but-group" @click="switchModel(formatItemsList[0].abilityId)" v-if='formatItemsList[0] && formatItemsList[0].showStatus'>
         <div class="icon model"></div>
         <!-- 模式 -->
-        <div class="text">模式</div>
+        <div class="text">{{formatItemsList[0].showName}}</div>
       </div>
-      <div class="but-group" @click="intiTime">
-        <div class="icon time"></div>
-        <!-- 定时 -->
-        <div class="text">定时</div>
+      <div class="but-group" @click="temperatureVisible = true" v-if='formatItemsList[5] && formatItemsList[5].showStatus'>
+        <div class="icon shan"></div>
+        <!-- 风速 -->
+        <!-- <div class="text">{{formatItemsList[2].showName}}</div> -->
+        <div class="text">设定</div>
+      </div>
+      <div class="but-group" @click="switchFunction(formatItemsList[7].abilityId)" v-if='formatItemsList[7] && formatItemsList[7].showStatus'>
+        <div class="icon menu"></div>
+        <!-- 功能 -->
+        <div class="text">{{formatItemsList[7].showName}}</div>
       </div>
     </div>
-    <yd-popup v-model="speedFlag" position="bottom" width="90%">
+    <yd-popup v-model="temperatureVisible" position="bottom" width="90%">
       <div class="content">
         <div class="title">
-          <span>环境设定</span>
-          <span @click='handleChangeWaterSlider' style="float:right">确定</span>
+          <span>设定</span>
+          <span @click='confirmSetting'>确定</span>
         </div>
         <div class="list">
           <div class='inside'>
             <div>
-              <span class='info'>温度</span>
+              <span class='info'>{{formatItemsList[3].showName}}</span>
               <img @click='reduceTem' src='@/assets/reduce.png'>
               <div>
-                <span class='number'>{{waterTemp}}</span>
-                <span class='icon'>℃</span>
+                <span class='number'>{{temNumber}}</span>
+                <span class='icon'>%</span>
               </div>
               <img @click='increaseTem' src='@/assets/add.png'>
+            </div>
+            <div>
+              <span class='info'>{{formatItemsList[4].showName}}</span>
+              <img @click='reduceTem2' src='@/assets/reduce.png'>
+              <div>
+                <span class='number'>{{temNumber2}}</span>
+                <span class='icon'>%</span>
+              </div>
+              <img @click='increaseTem2' src='@/assets/add.png'>
+            </div>
+            <div>
+              <span class='info'>{{formatItemsList[5].showName}}</span>
+              <img @click='reduceTem3' src='@/assets/reduce.png'>
+              <div>
+                <span class='number'>{{temNumber3}}</span>
+                <span class='icon'>℃</span>
+              </div>
+              <img @click='increaseTem3' src='@/assets/add.png'>
             </div>
           </div>
         </div>
@@ -123,8 +149,8 @@
       <div class="content">
         <div class="title">模式设定</div>
         <div class="list">
-          <ul v-if='formatItemsList[1] && formatItemsList[1].abilityId'>
-            <li v-if='item.status !== 2' v-for="(item,index) in getListData(formatItemsList[4].abilityId)" :class="{ active: modeCurrent == index }" @click="nodeClicked(getAbilityData(formatItemsList[4].abilityId),index,1)">
+          <ul v-if='formatItemsList[0] && formatItemsList[0].abilityId'>
+            <li v-if='item.status !== 2' v-for="(item,index) in getListData(formatItemsList[0].abilityId)" :class="{ active: modeCurrent == index }" @click="nodeClicked(getAbilityData(formatItemsList[0].abilityId),index,1)">
               <span>{{ item.optionDefinedName || item.optionName }}</span>
               <div class="icon"></div>
             </li>
@@ -134,11 +160,11 @@
     </yd-popup>
     <yd-popup v-model="functionFlag" position="bottom" width="90%">
       <div class="content">
-        <div class="title">风速设定</div>
+        <div class="title">功能设定</div>
         <div class="list">
-          <ul v-if='formatItemsList[3] && formatItemsList[3].abilityId'>
-            <li v-if='item && item.status !== 2' v-for="(item,index) in getListData(formatItemsList[3].abilityId)" :class="{ active: currentSpeedRight == index}" @click="nodeClicked(getAbilityData(formatItemsList[3].abilityId),index,2)">
-              <span>{{ item.optionDefinedName }}</span>
+          <ul v-if='formatItemsList[7] && formatItemsList[7].abilityId'>
+            <li v-if='item && item.status !== 2' v-for="item in getListData(formatItemsList[7].abilityId,'func')" :class="{ active: item.isChecked}" @click="nodeClicked(item,'',3)" :key='item.abilityId'>
+              <span>{{ item.definedName || item.abilityName }}</span>
               <div class="icon"></div>
             </li>
           </ul>
@@ -159,20 +185,11 @@
 import { Loading, Toast } from "vue-ydui/dist/lib.rem/dialog";
 import { Popup } from "vue-ydui/dist/lib.rem/popup";
 import { setWechatTitle } from "utils";
-import img1 from "../../assets/vrv/bg.png"; // 白天阴
-import img2 from "../../assets/vrv/bg.png"; // 夜晚阴
-import img3 from "../../assets/vrv/bg.png"; // 夜晚晴
-import img4 from "../../assets/vrv/bg.png"; // 白天晴
+import img1 from "../../assets/bak3.jpg"; // 白天阴
+import img2 from "../../assets/bak2.jpg"; // 夜晚阴
+import img3 from "../../assets/bak1.jpg"; // 夜晚晴
+import img4 from "../../assets/bak4.jpg"; // 白天晴
 import Store from "../wenkong/store";
-import yi from "../../assets/yi.png"; // 第一个
-import er from "../../assets/er.png"; // 第二个
-import sans from "../../assets/sans.png"; // 第三个
-import si from "../../assets/si.png"; // 第四个
-
-import shan from "../../assets/vrv/shan.png";
-import ms from "../../assets/vrv/ms.png";
-import ds from "../../assets/vrv/ds.png";
-import wd from "../../assets/vrv/wd.png";
 import {
   getModelVo,
   newQueryDetailByDeviceId,
@@ -186,25 +203,17 @@ let prevValues = '' //当一次用户选择的picker组件的第二个值，来�
 let currValues = '' // 当前用户所在的左侧滑杆的值
 
 export default {
-  data() {
+  data () {
     return {
-      shan:shan,
-      ms:ms,
-      ds:ds,
-      wd:wd,
-      yi:yi,
-      er:er,
-      sans:sans,
-      si:si,
-      waterTemp:10,
       value7: 20,
-      model:'制冷',
-      speedCurrent:0,
       shutdown: "", // 关机
       cloudyDay: img1, // 阴天
       sunnyDay: img4, // 晴天
       cloudyNight: img2, // 夜晚阴
       sunnyNight: img3, // 夜晚晴
+      temNumber: 0, // 客户设定温度
+      temNumber2: 0, // 客户设定温度
+      temNumber3: 0, // 客户设定温度
       specIndex: 0,
       pageIsShow: false,
       img: img4,
@@ -218,11 +227,10 @@ export default {
       isSleep: false, // 睡眠
       modeFlag: false, // 模式设置
       deviceObj: {},
-      speedRightCurrent:undefined,
       modeCurrent: undefined,
-      masterDeviceId: Store.fetch("masterDeviceId"),
+      temperatureVisible:false,
       currentSpeedLeftIndexLabel: "", // 送风风速当前档位
-      currentSpeedRightIndexLabel: "1挡", // 回风风速当前档位
+      currentSpeedRightIndexLabel: "", // 回风风速当前档位
       currentSpeedLeft: 0, // 送风风速当前档位对应的slider数值
       currentSpeedRight: 0,
       modeData: [],
@@ -247,11 +255,12 @@ export default {
       batteryList3: "",
       setInter2: undefined,
       AQI: "优",
-      hasSet:false
+      hasSet: false // 保证一些数据每次进入页面只刷新一次。
     };
   },
   computed: {
-    getOuterPM() {
+
+    getOuterPM () {
       // 对应配置项被用作室内PM2.5，所以室外PM2.5直接返回第三方数据
       return this.outerPm;
       // 获取室外PM2.5数据，优先使用室外传感器数据
@@ -263,7 +272,7 @@ export default {
       if (!currData) {
         return this.outerPm;
       }
-      
+
       const currValue = currData.currValue;
 
       if (currValue && currValue !== "0") {
@@ -271,7 +280,7 @@ export default {
       }
       return this.outerPm;
     },
-    getOuterHum() {
+    getOuterHum () {
       // 室外湿度
       if (!this.formatItemsList[14] || !this.formatItemsList[14].abilityId) {
         if (!this.outerHum) {
@@ -296,7 +305,7 @@ export default {
       }
       return this.outerHum.replace("%", "");
     },
-    getOuterTem() {
+    getOuterTem () {
       // 室外温度
       if (!this.formatItemsList[13] || !this.formatItemsList[13].abilityId) {
         if (!this.outerTem) {
@@ -321,13 +330,13 @@ export default {
       }
       return this.outerTem.replace("℃", "");
     },
-    leftSpeedName() {
-      const name = "设定温度";
-      if (!this.formatItemsList[6] || !this.formatItemsList[6].abilityId) {
+    leftSpeedName () {
+      const name = "送风风速";
+      if (!this.formatItemsList[2] || !this.formatItemsList[2].abilityId) {
         return name;
       }
       const leftData = this.getAbilityData(
-        this.formatItemsList[6].abilityId,
+        this.formatItemsList[2].abilityId,
         "left"
       );
       if (!leftData) {
@@ -335,7 +344,7 @@ export default {
       }
       return leftData.definedName || leftData.abilityName;
     },
-    rightSpeedName() {
+    rightSpeedName () {
       const name = "回风风速";
       if (!this.formatItemsList[2] || !this.formatItemsList[2].abilityId) {
         return name;
@@ -366,90 +375,138 @@ export default {
         return;
       }
 
-      const ablityId = this.formatItemsList[2].abilityId.split(",");
+      const ablityId = this.formatItemsList[3].abilityId.split(",");
+      const ablityId1 = this.formatItemsList[4].abilityId.split(",");
+      const ablityId2 = this.formatItemsList[5].abilityId.split(",");
+
       ablityId.forEach(id => {
         const ability = this.getAbilityData(id);
         // 设置温度的数值
-        if (ability.dirValue === "2DD.0") {
+        if (ability.dirValue === "JSSD") {
           // console.log(this.temNumber)
-          this.waterTemp = Number(ability.currValue);
+          this.temNumber = Number(ability.currValue);
         }
       });
+      ablityId1.forEach(id => {
+        const ability = this.getAbilityData(id);
+        if (ability.dirValue === "CSSD") {
+          // console.log(this.temNumber)
+          this.temNumber2 = Number(ability.currValue);
+        }
+      });
+      // ablityId2.forEach(id => {
+      //   const ability = this.getAbilityData(id);
+      //   if (ability.dirValue === "2DD.0") {
+      //     // console.log(this.temNumber)
+      //     this.temNumber3 = Number(ability.currValue);
+      //   }
+      // });
       this.hasSet = true;
     },
-    increaseTem () {
-      this.waterTemp += 1;
+    sleep(delay){
+       var start = (new Date()).getTime();
+        while ((new Date()).getTime() - start < delay) {
+          continue;
+        }
     },
-    reduceTem () {
-      if (this.waterTemp <= 0) {
-        return;
-      }
-      this.waterTemp -= 1;
+    confirmSetting () {
+      this.sendFuncs("JSSD", this.temNumber);
+      // this.sendFunc("2DE.0", this.humNumber);
+      this.sleep(800)
+      this.sendFuncs("CSSD", this.temNumber2);
+      this.sleep(1000)
+      this.sendFuncs("2DD.0", this.temNumber3);
     },
-    handleChangeWaterSlider () {
-      let tempArray = this.abilitysList.find(item => item.abilityId == this.formatItemsList[2].abilityId);
-
-      if (JSON.stringify(tempArray) === '{}') {
-        return false;
-      }
+    sendFuncs (funcId, value, cb) {
+      // 发送指令
       sendFunc({
         deviceId: this.deviceId,
-        funcId: tempArray.dirValue,
-        value: this.waterTemp
-      }).then(res => {
-        if (res.code === 200) {
-          Toast({
-            mes: "发送成功",
-            timeout: 1000,
-            icon: "success"
-          });
-          console.info(
-            "指令发送成功:",
-            tempArray.dirValue,
-            "-",
-            this.waterTemp
-          );
+        funcId: funcId,
+        value: value
+      }).then(() => {
+        if (cb) {
+          cb();
         }
+        Toast({
+          mes: "指令发送成功",
+          timeout: 1000,
+          icon: "success"
+        });
+        this.temperatureVisible = false;
+        console.info("指令发送成功:", funcId, "-", value);
       });
+    },
+    increaseTem () {
+      this.temNumber += 1;
+    },
+    reduceTem () {
+      if (this.temNumber <= 0) {
+        return;
+      }
+      this.temNumber -= 1;
+    },
+    increaseTem2 () {
+      this.temNumber2 += 1;
+    },
+    reduceTem2 () {
+      if (this.temNumber2 <= 0) {
+        return;
+      }
+      this.temNumber2 -= 1;
+    },
+    increaseTem3 () {
+      this.temNumber3 += 1;
+    },
+    reduceTem3 () {
+      if (this.temNumber3 <= 0) {
+        return;
+      }
+      this.temNumber3 -= 1;
     },
     /**
      * 开启回风风机？
      */
-    hasRightWind() {
+    hasRightWind () {
       const ids = this.formatItemsList[2].abilityId.split(",");
       return ids.length === 2;
     },
     /**
      * 循环阈处于打开状态？
      */
-    // isCycleSwitchOpen() {
-    //   // 如果当前指令是外风机的，判断是否循环阀是否打开，没有的话。禁止发送指令
-    //   const modelData = this.getListData(
-    //     this.formatItemsList[3].abilityId,
-    //     "func"
-    //   );
-    //   if (!modelData) {
-    //     return false;
-    //   }
+    isCycleSwitchOpen () {
+      // 如果当前指令是外风机的，判断是否循环阀是否打开，没有的话。禁止发送指令
+      const modelData = this.getListData(
+        this.formatItemsList[3].abilityId,
+        "func"
+      );
+      if (!modelData) {
+        return false;
+      }
 
-    //   // item可能为undefined
-    //   const cycleSwitch = modelData.filter(
-    //     item => item && item.dirValue === "290"
-    //   )[0];
-    //   return cycleSwitch && cycleSwitch.isChecked;
-    // },
-    leftStep() {
+      // item可能为undefined
+      const cycleSwitch = modelData.filter(
+        item => item && item.dirValue === "290"
+      )[0];
+      return cycleSwitch && cycleSwitch.isChecked;
+    },
+    leftStep () {
       const step =
         100 /
         (this.getListData(this.formatItemsList[2].abilityId, "left").length -
           1);
       return step;
     },
-    rightStep() {
-      const step =100/100
+    rightStep () {
+      if (!this.hasRightWind()) {
+        return 0;
+      }
+      const step =
+        100 /
+        (this.getListData(this.formatItemsList[2].abilityId, "right").length -
+          1);
       return step;
     },
-    sliderChangedLeft(val) {
+    sliderChangedLeft (val) {
       const index = val / this.leftStep();
       const data = this.getAbilityData(
         this.formatItemsList[2].abilityId,
@@ -481,14 +538,14 @@ export default {
         );
       });
     },
-    sliderChangedRight(val) {
-      // if (!this.isCycleSwitchOpen()) {
-      //   Toast({
-      //     mes: "循环阀未打开，禁止操作此风机！",
-      //     timeout: 1000
-      //   });
-      //   return;
-      // }
+    sliderChangedRight (val) {
+      if (!this.isCycleSwitchOpen()) {
+        Toast({
+          mes: "循环阀未打开，禁止操作此风机！",
+          timeout: 1000
+        });
+        return;
+      }
       const index = val / this.rightStep();
       const data = this.getAbilityData(
         this.formatItemsList[2].abilityId,
@@ -520,7 +577,7 @@ export default {
         );
       });
     },
-    changeSleepStatus() {
+    changeSleepStatus () {
       this.isSleep = false;
       sendFunc({
         deviceId: this.deviceId,
@@ -535,7 +592,7 @@ export default {
         console.info("指令发送成功:", "210", "-", "3");
       });
     },
-    getAbilityByDirValue(dirValue) {
+    getAbilityByDirValue (dirValue) {
       // 根据指令值找对应的功能项数据，双风机风速用到
       return this.abilitysList.filter(item => item.dirValue === dirValue)[0];
     },
@@ -546,18 +603,19 @@ export default {
      * @param which right 送风风速
      * @param which func 功能
      */
-    getListData(abilityId, which) {
+    getListData (abilityId, which) {
       // 说明是风速的abilityId，那么特殊情况，特殊处理
       if (which === "left") {
         return this.getListData(abilityId.split(",")[0]);
       } else if (which === "right") {
         return this.getListData(abilityId.split(",")[1]);
       } else if (which === "func") {
+        // console.log(abilityId)
         return abilityId.split(",").map(id => {
           return this.getAbilityData(id);
         });
       }
-
+      // console.log(abilityId)
       // 根据功能id获取功能项的数据
       const result = this.abilitysList.filter(
         item => item.abilityId == abilityId
@@ -568,16 +626,20 @@ export default {
      * 找到对应的功能项数据
      * @param which left/right 表示内风机/外风机
      */
-    getAbilityData(abilityId, which) {
+    getAbilityData (abilityId, which) {
       if (which === "left") {
         return this.abilitysList.filter(item => item.dirValue === "280")[0];
+      }
+      if (which === "right") {
+        return this.abilitysList.filter(item => item.dirValue === "281")[0];
       }
       const result = this.abilitysList.filter(
         item => item.abilityId == abilityId
       )[0];
+      // console.log(result)
       return result;
     },
-    intiTime() {
+    intiTime () {
       if (!this.isOpen) {
         this.$toast("当前关机状态，不可操作", "bottom");
         return false;
@@ -591,44 +653,67 @@ export default {
         }
       });
     },
-    setPopDialogData() {
+    setPopDialogData () {
+      // console.log(123)
       // 实时设置下方模式、风速，功能等弹框内的数据
       // 为了解决：弹框打开的情况下，设备状态变化时，弹框内选项数据却没有变更的问题。
 
-      const updateCurrData = () => {
-        // const data = this.abilitysList.find(item => item.abilityId == this.formatItemsList[9].abilityId);
-        // this.currMode = data.currValue;
-
-        let tempArray = this.abilitysList.find(item => item.abilityId == this.formatItemsList[2].abilityId);
-        // this.waterTemp = Number(tempArray.currValue)
-      }
       // 更新模式选项
       const updateModel = () => {
         const data = this.abilitysList.filter(
-          item => item.abilityId == this.formatItemsList[4].abilityId
+          item => item.abilityId == this.formatItemsList[0].abilityId
         )[0];
+        // console.log(data)
         if (!data) {
           return;
         }
-
+        // console.log(1231)
         // 根据isSelect的值，对相应选项执行默认选中行为
+        // console.log(data)
         data.abilityOptionList.forEach((item, iIndex) => {
+          // console.log(item)
           if (item.isSelect === 0) {
             return;
           }
+
           // “模式选项”
           this.modeCurrent = iIndex;
-          this.model = item.optionDefinedName
+          // console.log(iIndex)
+          // 如果当前选中对模式是睡眠，那么开启睡眠弹框
+          // if (item.optionValue === "2") {
+          //   this.isSleep = true;
+          // } else {
+          //   this.isSleep = false;
+          // }
         });
       };
 
       const updateWindSpeed = () => {
+        // 找到内风速的功能数据
+        // P.S. 这里内外风速区分直接根据指令来做了。
+        const dataLeft = this.abilitysList.filter(
+          item => item.dirValue === "280"
+        )[0];
+        if (!dataLeft) {
+          return;
+        }
+
+        // 根据isSelect的值，对相应选项执行默认选中行为
+        dataLeft.abilityOptionList.forEach((item, iIndex) => {
+          if (item.isSelect === 0) {
+            return;
+          }
+
+          // “内风速选项”
+          this.currentSpeedLeft = this.leftStep() * iIndex;
+          this.currentSpeedLeftIndexLabel =
+            item.optionDefinedName || item.definedName;
+        });
 
         // 外风速的功能数据
         const dataRight = this.abilitysList.filter(
-          item => item.dirValue === "280"
+          item => item.dirValue === "281"
         )[0];
-        // console.log(dataRight)
         if (!dataRight) {
           return;
         }
@@ -638,21 +723,17 @@ export default {
           if (item.isSelect === 0) {
             return;
           }
-          // this.speedCurrent = iIndex
-          // this.speeds = item.optionDefinedName
-          // // “外风速选项”
+          // “外风速选项”
           this.currentSpeedRight = this.rightStep() * iIndex;
-          // console.log(this.currentSpeedRight)
           this.currentSpeedRightIndexLabel =
             item.optionDefinedName || item.definedName;
         });
-        
       };
 
       // 功能多选项的初始化
       const updateAbility = () => {
         const data = this.getListData(
-          this.formatItemsList[3].abilityId,
+          this.formatItemsList[7].abilityId,
           "func"
         );
         data.forEach(ability => {
@@ -670,7 +751,7 @@ export default {
         });
       };
 
-      if (this.formatItemsList[1].abilityId) {
+      if (this.formatItemsList[0].abilityId) {
         updateModel();
       }
       if (this.formatItemsList[2].abilityId) {
@@ -679,23 +760,22 @@ export default {
       if (this.formatItemsList[3].abilityId) {
         updateAbility();
       }
-      updateCurrData()
     },
-    switchModel(id) {
+    switchModel (id) {
       if (!this.isOpen) {
         this.$toast("当前关机状态，不可操作", "bottom");
         return false;
       }
       this.modeFlag = true;
     },
-    switchSpeed(id) {
+    switchSpeed (id) {
       if (!this.isOpen) {
         this.$toast("当前关机状态，不可操作", "bottom");
         return false;
       }
       this.speedFlag = true;
     },
-    switchFunction() {
+    switchFunction () {
       if (!this.isOpen) {
         this.$toast("当前关机状态，不可操作", "bottom");
         return false;
@@ -703,7 +783,7 @@ export default {
 
       this.functionFlag = true;
     },
-    intoSet() {
+    intoSet () {
       if (!this.isOpen) {
         return;
       }
@@ -720,7 +800,7 @@ export default {
         }
       });
     },
-    hasTwoAbility() {
+    hasTwoAbility () {
       // 功能项数据中是否存在：主机模式(制冷制热)和主机开关，存在返回true
       const dirValueArray = ["2D8.0", "2DR.0"];
       const filter = this.abilitysList.filter(ability =>
@@ -733,7 +813,7 @@ export default {
       }
       return 0;
     },
-    childMethod(type) {
+    childMethod (type) {
       if (!this.isOpen && !type) {
         this.$toast("当前关机状态，不可操作", "bottom");
         return false;
@@ -771,10 +851,10 @@ export default {
         );
       });
     },
-    onOffMethod() {
+    onOffMethod () {
       // 开关机
       const tempArray = this.abilitysList.filter(
-        item => item.abilityId == this.formatItemsList[0].abilityId
+        item => item.abilityId == this.formatItemsList[6].abilityId
       )[0];
       const tempList = tempArray.abilityOptionList;
       let index = 0;
@@ -806,7 +886,7 @@ export default {
         );
       });
     },
-    offopen(DirValue, Dirindex) {
+    offopen (DirValue, Dirindex) {
       sendFunc({
         deviceId: this.deviceId,
         funcId: DirValue,
@@ -815,37 +895,27 @@ export default {
         console.info("指令发送成功:", "-", Dirindex);
       });
     },
-    nodeClicked(item, index, type) {
+    nodeClicked (item, index, type) {
+      console.log(item,index,type)
       // 如果是功能，index表示将要发送的指令value： 0/1 不选中/选中
       if (type === 3) {
         index = item.isChecked ? 0 : 1;
       }
-      if(type === 2){
-        // item.isSelect
-        this.currentSpeedRight = this.rightStep() * index;
-        // console.log(this.currentSpeedRight)
-        this.currentSpeedRightIndexLabel = item.abilityOptionList[index].optionDefinedName
-      }
-      if(type === 1){
-        // item.isSelect
-        // console.log(this.currentSpeedRight)
-        this.model = item.abilityOptionList[index].optionDefinedName
-      }
       this.sendFunc(item, index, type);
     },
-    sendFunc(item, index, type, cb) {
+    sendFunc (item, index, type, cb) {
       // 模式、风速、功能的指令发送函数
       // Loading.open('发送中...')
       sendFunc({
         deviceId: this.deviceId,
         funcId: item.dirValue,
-        value: item.abilityOptionList[index].optionValue
+        value: type === 3 ? index : item.abilityOptionList[index].optionValue
       })
         .then(res => {
           if (type === 1) {
             this.modeCurrent = index;
           } else if (type === 2) {
-            // cb();
+            cb();
           } else if (type === 3) {
             item.isChecked = !item.isChecked;
           }
@@ -868,16 +938,19 @@ export default {
           Loading.close();
         });
     },
-    getIndexAbilityData() {
+    getIndexAbilityData () {
       // 获取H5控制页面功能项数据，带isSelect参数
       getModelVo({ deviceId: this.deviceId, pageNo: 1 }).then(res => {
         if (res.code === 200 && res.data) {
           const data = res.data;
-          Store.save("modelId",data.modelId)
+          Store.save("modelId", data.modelId)
           this.pageName = data.pageName;
           // 将功能集里的内外风机的数据加到版式集合中。为了后面持续刷新两个风机的数据
           let windData = [];
-          if (false) {
+          if (
+            data.formatItemsList[2].abilityId &&
+            data.formatItemsList[2].showStatus
+          ) {
             let ids = data.formatItemsList[2].abilityId.split(",");
             data.abilitysList.forEach(item => {
               if (ids.includes(String(item.abilityId))) {
@@ -890,7 +963,7 @@ export default {
           }
 
           this.formatItemsList = data.formatItemsList.concat(windData);
-          // console.log(this.formatItemsList)
+
           data.abilitysList.forEach(item => {
             item["currValue"] = "";
             item.abilityOptionList &&
@@ -902,7 +975,7 @@ export default {
           // 定时请求接口数据，更新页面数据
           this.setInter = setInterval(() => {
             this.getIndexFormatData();
-          }, 1000);
+          }, 3000);
           //滤网检查
           const windOption1 = data.abilitysList;
           for (var i = 0; i < windOption1.length; i++) {
@@ -920,7 +993,7 @@ export default {
         }
       });
     },
-    getStrainerData() {
+    getStrainerData () {
       for (var i = 0; i < this.batteryList1.length; i++) {
         this.dirValueList.push(this.batteryList1[i].optionValue);
       }
@@ -939,7 +1012,7 @@ export default {
           console.log(error);
         });
     },
-    getIndexFormatData() {
+    getIndexFormatData () {
       // 获取H5控制页面功能项数据，带isSelect参数
 
       // 根据功能项id筛选功能项
@@ -949,7 +1022,6 @@ export default {
       let ids = this.formatItemsList
         .filter(item => item.showStatus == 1 && item.abilityId)
         .map(item => item.abilityId);
-      
       let tempIds = [];
       ids.forEach(id => {
         tempIds.push(...String(id).split(","));
@@ -961,9 +1033,6 @@ export default {
       }).then(res => {
         const data = res.data;
         // 将res.data中的isSelect和dirValue赋值过去
-        // console.log(this.abilitysList)
-        // console.log(data)
-
         this.abilitysList.forEach((item, index) => {
           const realAbilityData = findTheAbility(data, item.abilityId);
           if (!realAbilityData) {
@@ -974,7 +1043,6 @@ export default {
           if (realAbilityData.currValue) {
             item["currValue"] = realAbilityData.currValue;
           }
-
           if (
             !item.abilityOptionList ||
             item.abilityOptionList.length === 0 ||
@@ -982,27 +1050,24 @@ export default {
           ) {
             return;
           }
-
           item.abilityOptionList.forEach((option, oIndex) => {
             Object.assign(option, realAbilityData.abilityOptionList[oIndex]);
           });
         });
-        // console.log(22)
-        // console.log(this.abilitysList)
-        this.switchHandler();
-        this.setTemperature();
-        // console.log(this.isOpen)
         if (this.isOpen) {
           this.setPopDialogData();
         }
+        this.switchHandler();
+        
         // 获取列表最后一项：空气质量，的值
-        // const lastItem = data[data.length - 1];
-        // if (lastItem.abilityName === "空气质量") {
-        //   this.AQI = lastItem.currValue;
-        // }
+        const lastItem = data[data.length - 1];
+        if (lastItem.abilityName === "空气质量") {
+          this.AQI = lastItem.currValue;
+        }
+        this.setTemperature();
       });
     },
-    setWeather() {
+    setWeather () {
       // 当前天气模式
       if (!this.isOpen) {
         this.img = this.shutdown;
@@ -1055,8 +1120,8 @@ export default {
 
       this.img = currentBak;
     },
-    getLocation() {
-      getLocation(this.masterDeviceId).then(res => {
+    getLocation () {
+      getLocation(this.deviceId).then(res => {
         const data = res.data;
 
         // 取地址的省市区信息
@@ -1071,8 +1136,8 @@ export default {
         }
       });
     },
-    getWeather() {
-      getWeather(this.masterDeviceId).then(res => {
+    getWeather () {
+      getWeather(this.deviceId).then(res => {
         const data = res.data;
 
         this.weather = data.weather;
@@ -1083,13 +1148,14 @@ export default {
         this.setWeather();
       });
     },
-    switchHandler() {
+    switchHandler () {
       // 开关机初始化
       const tempArray = this.abilitysList.filter(
-        item => item.abilityId == this.formatItemsList[0].abilityId
+        item => item.abilityId == this.formatItemsList[6].abilityId
       )[0].abilityOptionList;
 
       // 找到关机的对象
+      // console.log(tempArray)
       const tempObj = tempArray[0].dirValue == 0 ? tempArray[0] : tempArray[1];
       if (tempObj.isSelect === 1) {
         // 说明是关机
@@ -1099,23 +1165,28 @@ export default {
       }
 
       // 童锁初始化
-      // const tempArray2 = this.abilitysList.filter(
-      //   item => item.abilityId == this.formatItemsList[10].abilityId
-      // )[0].abilityOptionList;
+      try {
+        const tempArray2 = this.abilitysList.filter(
+          item => item.abilityId == this.formatItemsList[10].abilityId
+        )[0].abilityOptionList;
 
-      // const tempObj2 =
-      //   tempArray2[0].dirValue == 0 ? tempArray2[0] : tempArray2[1];
-      // if (tempObj2.isSelect === 1) {
-      //   this.isLock = false;
-      // } else {
-      //   this.isLock = true;
-      // }
+        const tempObj2 =
+          tempArray2[0].dirValue == 0 ? tempArray2[0] : tempArray2[1];
+        if (tempObj2.isSelect === 1) {
+          this.isLock = false;
+        } else {
+          this.isLock = true;
+        }
+      } catch (error) {
+
+      }
+
     },
     /**
      * 初始化背景图片
      * 如果客户设置的话，就用客户的；否则使用默认的
      */
-    initBackground() {
+    initBackground () {
       const bgImgs = JSON.parse(Store.fetch("bgImgs"));
       // 依次排列：关机，白天-晴天，白天-阴天，夜晚-晴天，夜晚-阴天
       if (bgImgs[0]) {
@@ -1135,7 +1206,7 @@ export default {
       }
     }
   },
-  created() {
+  created () {
     this.cHeight = window.innerWidth * 0.45;
     if (window.innerWidth <= 340) {
       this.cHeight = window.innerWidth * 0.45;
@@ -1149,11 +1220,11 @@ export default {
     this.getWeather();
     this.initBackground();
   },
-  mounted() {
+  mounted () {
     this.thePicker = this.$refs.picker
   },
   watch: {
-    isOpen(val) {
+    isOpen (val) {
       if (val) {
         this.setWeather();
       } else {
@@ -1161,7 +1232,7 @@ export default {
         this.img = this.shutdown || "";
       }
     },
-    isSleep(val) {
+    isSleep (val) {
       // 如果睡眠模式打开，隐藏掉模式弹框
       if (val) {
         this.modeFlag = false;
@@ -1171,7 +1242,7 @@ export default {
   components: {
     "yd-popup": Popup
   },
-  destroyed() {
+  destroyed () {
     clearInterval(this.setInter);
     clearInterval(this.setInter2);
   }
@@ -1250,10 +1321,6 @@ export default {
     span {
       color: #fff;
       font-size: tvw(83);
-      &:last-child{
-        font-size: tvw(88);
-        margin-top: 4px;
-      }
     }
   }
   .header {
@@ -1287,6 +1354,9 @@ export default {
       font-size: 16px;
       padding-bottom: 10px;
       border-bottom: 1px solid #dfdfdf;
+      span:last-child {
+        float: right;
+      }
     }
     .list {
       & ul li {
@@ -1308,28 +1378,27 @@ export default {
           }
         }
       }
-    }
-    .inside {
+      .inside {
         > div {
           width: fit-content;
           display: flex;
           align-items: center;
           margin: 20px auto 20px auto;
           > div {
-            margin: auto 30px;
-            width: 50px;
-            height: 30px;
+            margin: auto 15px;
+            width: 60px;
+            height: 34px;
             background-image: url("~@/assets/small_background.png");
-            background-size: 50px 30px;
+            background-size: 60px 34px;
             background-repeat: no-repeat;
-            line-height: 30px;
+            line-height: 38px;
             text-align: center;
             color: #fff;
             span.number {
-              font-size: 14px;
+              font-size: 18px;
             }
             span.icon {
-              font-size: 16px;
+              font-size: 17px;
             }
           }
           img {
@@ -1343,6 +1412,7 @@ export default {
           }
         }
       }
+    }
     .spec {
       padding-left: 10px;
       padding-right: 10px;
@@ -1379,6 +1449,7 @@ export default {
       }
     }
   }
+  
   .center {
     margin-top: 10px;
     .tip {
@@ -1406,10 +1477,17 @@ export default {
       width: 55%;
       margin: 0 auto;
       margin-top: 10px;
-      display: flex;
+      position: relative;
       overflow: hidden;
-      justify-content: space-between;
-      padding-top: 30px;
+      &::before {
+        content: "";
+        position: absolute;
+        width: 1px;
+        height: 30px;
+        background: #ffffff;
+        left: 50%;
+        top: 10px;
+      }
       & div {
         text-align: center;
         font-size: 14px;
@@ -1421,34 +1499,8 @@ export default {
       .t1 {
         float: left;
       }
-      em {
-        font-weight: 500;
-      }
-      span {
-        word-break: keep-all;
-      }
-    }
-    .temper {
-      width: 85%;
-      margin: 0 auto;
-      margin-top: 10px;
-      position: relative;
-      overflow: hidden;
-      & div {
-        // text-align: center;
-        font-size: 14px;
-        line-height: 24px;
-        & span {
-          font-size: 16px;
-        }
-      }
-      .t1 {
-        float: left;
-        width: 28%;
-        height:70px;
-        padding: 10px 10px;
-        background:rgba(255, 255, 255, 0.3);
-        border-radius: 10px;
+      .t2 {
+        float: right;
       }
       em {
         font-weight: 500;
@@ -1543,8 +1595,8 @@ export default {
           background-size: 17px 15px;
         }
         &.shan {
-          background: url("../../assets/vrv/wd.png") no-repeat center top 6px;
-          background-size: 12px 20px;
+          background: url("../../assets/temperature.png") no-repeat center top 6px;
+          background-size: 14px 20px;
         }
         &.menu {
           background: url("../../assets/menu.png") no-repeat center center;
@@ -1553,22 +1605,6 @@ export default {
       }
     }
   }
-  .current-info {
-    width: 27%;
-    margin: auto;
-    margin-top: 30px;
-    margin-bottom: 10px;
-    font-size: 14px;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    p {
-      width: fit-content;
-      .strong {
-        font-size: 18px;
-      }
-    }
-  }
 }
+
 </style>
