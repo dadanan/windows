@@ -1088,6 +1088,7 @@ export default {
     span {
       color: #fff;
       font-size: tvw(83);
+      
     }
   }
   .header {
