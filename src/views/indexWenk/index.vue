@@ -780,7 +780,7 @@ export default {
       color: #fff;
       font-size: tvw(83);
       &:last-child{
-        font-size: tvw(88);
+        font-size: tvw(85);
         margin-top: 4px;
       }
     }

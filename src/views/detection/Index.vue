@@ -586,7 +586,6 @@ export default {
     getWeather() {
       getWeather(this.deviceId).then(res => {
         const data = res.data;
-
         this.weather = data.weather;
         this.outerTem = data.outerTem;
         this.outerPm = data.outerPm;

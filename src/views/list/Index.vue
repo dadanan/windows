@@ -18,8 +18,8 @@
         </div>
         <div slot="txt" style="color:#20aaf8;margin-left:5px; position: absolute; right: 30px;" v-show="groupFlag" @click="groupFlag = false">取消
         </div>
-        <div style="padding:15px">
-          <div class="list-item" v-swipeleft.stop="swipeleft" v-swiperight="swiperight" @click="intoIndex(child,item)" v-for="(child,cindex) in item.deviceItemPos" :key="cindex">
+        <div style="padding:0px 15px">
+          <div class="list-item" style="padding:15px 0px;" v-swipeleft.stop="swipeleft" v-swiperight="swiperight" @click="intoIndex(child,item)" v-for="(child,cindex) in item.deviceItemPos" :key="cindex">
             <div class="item-left">
               <div class="img">
                 <div class="p-img">
@@ -31,7 +31,7 @@
                     <em>离线</em>
                   </span>
                 </div>
-                <div class="img-text">
+                <!-- <div class="img-text">
                   <p>
                     <span class="img-text1">{{ child.deviceName }}</span>
                     <i class="addr" v-if="loopValue === false && child.location"></i>
@@ -47,6 +47,27 @@
                     <p>ID:{{ child.deviceId }}</p>
                     <p>型号：{{ child.deviceModelName }}</p>
                   </template>
+                </div> -->
+                <div class="img-text">
+                  <p>
+                    <span class="img-text1">
+                      <img v-if='child.onlineStatus && child.powerStatus' class='power-status' src='../../assets/power-open.png'>
+                      <img v-if='child.onlineStatus && !child.powerStatus' class='power-status' src='../../assets/power-close.png'>
+                      {{ child.deviceName }}
+                    </span>
+                    <span class="img-text2">
+                      <i class="addr" v-if="loopValue === false && child.location"></i>
+                      <span v-if="loopValue === false">{{child.location && child.location.split(' ').map(str => str.split(',')).reduce((a, b) => a.concat(b),[]) .filter(s => s !== '')[0]}}</span>
+                    </span>
+                  </p>
+                  <template v-if='child.hasOwnProperty("childId")'>
+                    <p><span>从ID:{{ child.childId }}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>主ID:{{child.masterDeviceId}}</span></p>
+                    <p>主机型号:{{child.deviceModelName}}</p>
+                  </template>
+                  <template v-else>
+                    <p>ID:{{ child.deviceId }}</p>
+                    <p>型号：{{ child.deviceModelName }}</p>
+                  </template>
                 </div>
               </div>
             </div>
@@ -54,8 +75,8 @@
               <span class="group" v-if="loopValue === true" @click.stop="OpenDev(child,item.teamId,1)">分组</span>
               <span class="edit" v-if="loopValue === true" @click.stop="OpenDev(child,2)">编辑</span>
               <span class="delete" v-if="loopValue === true" @click.stop="deleteDev(child)" style="color: #a0a0a0;">删除</span>
-              <p>{{child.listShowName}}</p>
-              <p>{{child.listShowValue}}{{child.listShowUnit}}</p>
+              <!-- <p>{{child.listShowName}}</p>
+              <p>{{child.listShowValue}}{{child.listShowUnit}}</p> -->
             </div>
           </div>
           <div v-if="item.deviceItemPos.length === 0">暂无产品</div>
@@ -65,9 +86,13 @@
     <div v-else style="padding:10px 10px;">暂无产品</div>
     <div class="fixed-bottom">
       <div class="group">
-        <div class="active" @click="qRcode" v-if="!loopValue">扫码添加</div>
+        <div class="active" @click="qRcode" v-if="!loopValue">
+          <p class="ssa">扫码添加</p>
+        </div>
         <div class="active" v-else @click="selctButtonMethod(1,'cancel')">取消分组</div>
-        <div class="" @click="selctButtonMethod(0,'create')">新建分组</div>
+        <div class="" @click="selctButtonMethod(0,'create')">
+          <p class="ssa1">新建分组</p>
+        </div>
       </div>
     </div>
     <div class="wx-dialog dialog" v-if="wxValue">
@@ -801,7 +826,14 @@ export default {
 <style rel="stylesheet/scss" lang="scss" scoped>
 @import "src/common/scss/variable.scss";
 @import "src/common/scss/mixins.scss";
-
+.ssa{
+  padding-left:30px;
+  background:url("../../assets/Component25.png") no-repeat 52px center
+}
+.ssa1{
+  padding-left:30px;
+  background:url("../../assets/Component46.png") no-repeat 52px center
+}
 .list-wrapper {
   position: absolute;
   width: 100%;
@@ -942,7 +974,6 @@ export default {
     position: relative;
     display: flex;
     border-bottom: 1px solid #d9d9d9;
-    padding-bottom: 5px;
     margin-bottom: 5px;
     .item-left {
       display: flex;
@@ -975,8 +1006,8 @@ export default {
             position: absolute;
             width: 100%;
             height: 70px;
-            bottom: -4px;
-            left: 0px;
+            bottom: -2px;
+            left: -1px;
             text-align: center;
             color: #ffffff;
             background: url("../../assets/bak.png") no-repeat center center;
@@ -991,7 +1022,7 @@ export default {
             }
             & em {
               position: absolute;
-              bottom: -6px;
+              bottom: -4px;
               text-align: center;
               width: 100%;
               left: 0;
@@ -1009,10 +1040,10 @@ export default {
           left: 75px;
           top: 50%;
           transform: translateY(-50%);
-          width: 220px;
+          width: 120px;
           color: #666666;
           line-height: 16px;
-          overflow: hidden;
+          // overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
           & p:nth-child(1) {
@@ -1028,6 +1059,12 @@ export default {
           }
           .img-text1 {
             width: 120px;
+            font-size: 16px;
+          }
+          .img-text2{
+            position: absolute;
+            right: -126px;
+            color: #061780;
           }
           & p:nth-child(2) {
             overflow: hidden;
@@ -1040,14 +1077,14 @@ export default {
             height: 13px;
             width: 13px;
             display: inline-block;
-            background: url("../../assets/map1.png") no-repeat center center;
+            background: url("../../assets/Frame.png") no-repeat center center;
             background-size: contain;
-            margin: 0 8px;
+            // margin: 0 8px;
           }
           .power-status {
-            width: 15px;
-            height: 15px;
-            margin-left: 10px;
+            width: 12px;
+            height: 12px;
+            // margin-left: 10px;
           }
         }
       }

@@ -81,6 +81,7 @@ export default {
       wxDeviceId: this.$route.query.wxDeviceId,
       customerId: this.$route.query.customerId,
       setInter: undefined, // 定时id
+      masterDeviceId: Store.fetch("masterDeviceId"),
       dirValueList: [],
       batteryList3: "",
       setInter2: undefined
@@ -481,7 +482,7 @@ export default {
       });
     },
     getWeather () {
-      getWeather(this.deviceId).then(res => {
+      getWeather(this.masterDeviceId).then(res => {
         const data = res.data;
 
         this.weather = data.weather;
