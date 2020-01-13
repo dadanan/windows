@@ -16,8 +16,8 @@
     <div class="info">
       <img src="../../assets/map.png" style="width:12px;height:auto" />&nbsp;
       <span>{{location}}&nbsp;&nbsp;</span>
-      <span>{{weather}} 温度{{getOuterTem}}℃&nbsp;&nbsp;</span>
-      <span>湿度: {{getOuterHum}}%&nbsp;&nbsp;</span>
+      <span>{{weather}} 温度{{outerTem}}&nbsp;</span>
+      <span>湿度: {{getOuterHum}}%&nbsp;</span>
       <span>PM2.5: {{getOuterPM}}ug/m3&nbsp;&nbsp;</span>
     </div>
 
@@ -67,7 +67,7 @@
         </div>
         <div class="card-panel" v-if="formatItemsList[4].abilityId && formatItemsList[4].showStatus">
           <div class="card">
-            <p class="desc">测量温度 <span class="num">{{waterTempHSd}}°</span></p>
+            <p class="desc">供水温度 <span class="num">{{waterTempHSd}}°</span></p>
           </div>
         </div>
       </div>
@@ -621,7 +621,7 @@ export default {
         const data3 = this.abilitysList.find(item => item.abilityId == this.formatItemsList[4].abilityId);
         // this.waterTempGS = data1.currValue / 10;
         // this.waterTempHS = data2.currValue / 10;
-        this.waterTempHSd = data3.currValue / 10;
+        this.waterTempHSd = data3.currValue;
 
       };
 

@@ -355,7 +355,7 @@ export default {
       sendFunc({
         deviceId: this.deviceId,
         funcId: tempArray.dirValue,
-        value: this.waterTemp * 10
+        value: this.waterTemp
       }).then(res => {
         if (res.code === 200) {
           Toast({
@@ -600,10 +600,10 @@ export default {
           }
           if (data.currValue === '1') {
             temp = this.abilitysList.find(item => item.abilityId == this.formatItemsList[3].abilityId);
-            this.waterTemp = Number(temp.currValue) / 10
+            this.waterTemp = Number(temp.currValue)
           } else if (data.currValue === '2') {
             temp = this.abilitysList.find(item => item.abilityId == this.formatItemsList[2].abilityId);
-            this.waterTemp = Number(temp.currValue) / 10
+            this.waterTemp = Number(temp.currValue)
           }
         })
       }
@@ -634,9 +634,9 @@ export default {
         const data2 = this.abilitysList.find(item => item.abilityId == this.formatItemsList[5].abilityId);
         const data3 = this.abilitysList.find(item => item.abilityId == this.formatItemsList[11].abilityId);
         console.log(data2,data3)
-        this.waterTempGS = data1.currValue / 10;
-        this.waterTempHS = data2.currValue / 10;
-        this.waterTempHSd = data3.currValue / 10;
+        this.waterTempGS = data1.currValue;
+        this.waterTempHS = data2.currValue;
+        this.waterTempHSd = data3.currValue;
       };
 
       updateCurrData();

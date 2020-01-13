@@ -69,10 +69,10 @@
           <em>{{getAbilityData(formatItemsList[4].abilityId).currValue}}</em> PPM</span>
         <!-- TVOC -->
         <span v-if='formatItemsList[5] && formatItemsList[5].showStatus && getAbilityData(formatItemsList[5].abilityId)'>{{formatItemsList[5].showName}}
-          <em>{{Number(getAbilityData(formatItemsList[5].abilityId).currValue) / 100}}</em> mg/m³</span>
+          <em>{{Number(getAbilityData(formatItemsList[5].abilityId).currValue)}}</em> mg/m³</span>
         <span v-if='formatItemsList[6] && formatItemsList[6].showStatus'>{{formatItemsList[6].showName}}
           <!-- 甲醛 -->
-          <em>{{Number(getAbilityData(formatItemsList[6].abilityId).currValue) / 100}}</em> mg/m³</span>
+          <em>{{Number(getAbilityData(formatItemsList[6].abilityId).currValue)}}</em> mg/m³</span>
       </div>
     </div>
     <div class="but-list fixed">

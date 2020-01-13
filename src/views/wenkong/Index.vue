@@ -43,12 +43,12 @@
     <div class='current-info'>
       <p v-if='formatItemsList[4] && formatItemsList[4].showStatus'>
         {{formatItemsList[4] && formatItemsList[4].showName}}
-        <span class='strong'>{{(getAbilityData(formatItemsList[4].abilityId).currValue)/10}}</span>
+        <span class='strong'>{{(getAbilityData(formatItemsList[4].abilityId).currValue)}}</span>
         ℃
       </p>
       <p v-if='formatItemsList[5] && formatItemsList[5].showStatus'>
         {{formatItemsList[5] && formatItemsList[5].showName}}
-        <span class='strong'>{{(getAbilityData(formatItemsList[5].abilityId).currValue)/10}}</span>
+        <span class='strong'>{{(getAbilityData(formatItemsList[5].abilityId).currValue)}}</span>
         %
       </p>
     </div>

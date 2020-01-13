@@ -50,18 +50,18 @@
                 </div> -->
                 <div class="img-text">
                   <p>
-                    <span class="img-text1">
+                    <span class="img-text1" style="font-size:16px;">
                       <img v-if='child.onlineStatus && child.powerStatus' class='power-status' src='../../assets/power-open.png'>
                       <img v-if='child.onlineStatus && !child.powerStatus' class='power-status' src='../../assets/power-close.png'>
                       {{ child.deviceName }}
                     </span>
                     <span class="img-text2">
                       <i class="addr" v-if="loopValue === false && child.location"></i>
-                      <span v-if="loopValue === false">{{child.location && child.location.split(' ').map(str => str.split(',')).reduce((a, b) => a.concat(b),[]) .filter(s => s !== '')[0]}}</span>
+                      <span v-if="loopValue === false" style="font-size:12px">{{child.location && child.location.split(' ').map(str => str.split(',')).reduce((a, b) => a.concat(b),[]) .filter(s => s !== '')[0]}}</span>
                     </span>
                   </p>
                   <template v-if='child.hasOwnProperty("childId")'>
-                    <p><span>从ID:{{ child.childId }}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>主ID:{{child.masterDeviceId}}</span></p>
+                    <p  style="margin:8px 0px;"><span>从ID:{{ child.childId }}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span style="margin-left:20px" >主ID:{{child.masterDeviceId}}</span></p>
                     <p>主机型号:{{child.deviceModelName}}</p>
                   </template>
                   <template v-else>
@@ -960,11 +960,11 @@ export default {
         width: 50%;
         text-align: center;
         float: left;
-        border-top: 1px solid #2689ee;
-        background: #f7f7fa;
-        color: #2689ee;
+        // border-top: 1px solid #2689ee;
+        background: #F2F9FF;
+        color: #004A8F;
         &.active {
-          background: #2689ee;
+          background: #004A8F;
           color: #ffffff;
         }
       }
@@ -1002,16 +1002,17 @@ export default {
           height: 60px;
           overflow: hidden;
           border-radius: 100%;
+          box-shadow: 0px 2px 6px rgba(0, 74, 143, 0.15);
           & span {
             position: absolute;
             width: 100%;
             height: 70px;
-            bottom: -2px;
+            bottom: 3px;
             left: -1px;
             text-align: center;
             color: #ffffff;
             background: url("../../assets/bak.png") no-repeat center center;
-            background-size: 60px 60px;
+            background-size: 70px 70px;
             line-height: 30px;
             font-size: 10px;
             &.active {
@@ -1022,7 +1023,7 @@ export default {
             }
             & em {
               position: absolute;
-              bottom: -4px;
+              bottom: -5px;
               text-align: center;
               width: 100%;
               left: 0;
@@ -1040,7 +1041,7 @@ export default {
           left: 75px;
           top: 50%;
           transform: translateY(-50%);
-          width: 120px;
+          width: 220px;
           color: #666666;
           line-height: 16px;
           // overflow: hidden;
@@ -1063,7 +1064,7 @@ export default {
           }
           .img-text2{
             position: absolute;
-            right: -126px;
+            right: -36px;
             color: #061780;
           }
           & p:nth-child(2) {
@@ -1074,7 +1075,7 @@ export default {
           }
           .addr {
             /*background: url('../../assets/addr2.png') no-repeat center center;*/
-            height: 13px;
+            height: 11px;
             width: 13px;
             display: inline-block;
             background: url("../../assets/Frame.png") no-repeat center center;

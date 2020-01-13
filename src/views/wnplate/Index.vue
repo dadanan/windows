@@ -8,7 +8,7 @@
     <div class="info">
       <img src="../../assets/map.png" style="width:12px;height:auto" />&nbsp;
       <span >{{location}}&nbsp;</span>
-      <span >{{weather}} {{outerPm}}℃&nbsp;</span>
+      <span >{{weather}} {{outerTem}}℃&nbsp;</span>
       <span>湿度: {{getOuterHum}}%&nbsp;</span>
       <span >PM2.5: {{getOuterPM}}ug/m3&nbsp;</span>
       <span>质量: {{AQI}}</span>
@@ -77,10 +77,10 @@
           <em>{{getAbilityData(formatItemsList[11].abilityId).currValue}}</em> PPM</span>
         <!-- TVOC -->
         <span v-if='formatItemsList[13] && formatItemsList[13].showStatus && getAbilityData(formatItemsList[13].abilityId)'>{{formatItemsList[13].showName}}
-          <em>{{Number(getAbilityData(formatItemsList[13].abilityId).currValue) / 100}}</em> mg/m³</span>
+          <em>{{Number(getAbilityData(formatItemsList[13].abilityId).currValue)}}</em> mg/m³</span>
         <span v-if='formatItemsList[12] && formatItemsList[12].showStatus'>{{formatItemsList[12].showName}}
           <!-- 甲醛 -->
-          <em>{{Number(getAbilityData(formatItemsList[12].abilityId).currValue) / 100}}</em> mg/m³</span>
+          <em>{{Number(getAbilityData(formatItemsList[12].abilityId).currValue) }}</em> mg/m³</span>
       </div>
     </div>
     <div class="but-list fixed">
@@ -114,7 +114,7 @@
         </div>
         <div class="list">
           <div class='inside'>
-            <div>
+            <div v-if="formatItemsList[3].showStatus">
               <span class='info'>{{formatItemsList[3].showName}}</span>
               <img @click='reduceTem' src='@/assets/reduce.png'>
               <div>
@@ -123,7 +123,7 @@
               </div>
               <img @click='increaseTem' src='@/assets/add.png'>
             </div>
-            <div>
+            <div v-if="formatItemsList[4].showStatus">
               <span class='info'>{{formatItemsList[4].showName}}</span>
               <img @click='reduceTem2' src='@/assets/reduce.png'>
               <div>
@@ -132,7 +132,7 @@
               </div>
               <img @click='increaseTem2' src='@/assets/add.png'>
             </div>
-            <div>
+            <div  v-if="formatItemsList[5].showStatus">
               <span class='info'>{{formatItemsList[5].showName}}</span>
               <img @click='reduceTem3' src='@/assets/reduce.png'>
               <div>
@@ -249,6 +249,7 @@ export default {
       deviceId: this.$route.query.deviceId,
       wxDeviceId: this.$route.query.wxDeviceId,
       customerId: this.$route.query.customerId,
+      masterDeviceId: Store.fetch("masterDeviceId"),
       setInter: undefined, // 定时id
       batteryList1: [],
       dirValueList: [],
@@ -378,22 +379,23 @@ export default {
       const ablityId = this.formatItemsList[3].abilityId.split(",");
       const ablityId1 = this.formatItemsList[4].abilityId.split(",");
       const ablityId2 = this.formatItemsList[5].abilityId.split(",");
-
-      ablityId.forEach(id => {
-        const ability = this.getAbilityData(id);
-        // 设置温度的数值
-        if (ability.dirValue === "JSSD") {
-          // console.log(this.temNumber)
-          this.temNumber = Number(ability.currValue);
-        }
-      });
-      ablityId1.forEach(id => {
-        const ability = this.getAbilityData(id);
-        if (ability.dirValue === "CSSD") {
-          // console.log(this.temNumber)
-          this.temNumber2 = Number(ability.currValue);
-        }
-      });
+      if(ablityId[0] !=""){
+        ablityId.forEach(id => {
+          const ability = this.getAbilityData(id);
+          // 设置温度的数值
+          if (ability.dirValue === "JSSD") {
+            // console.log(this.temNumber)
+            this.temNumber = Number(ability.currValue);
+          }
+        });
+      }  
+      // ablityId1.forEach(id => {
+      //   const ability = this.getAbilityData(id);
+      //   if (ability.dirValue === "CSSD") {
+      //     // console.log(this.temNumber)
+      //     this.temNumber2 = Number(ability.currValue);
+      //   }
+      // });
       // ablityId2.forEach(id => {
       //   const ability = this.getAbilityData(id);
       //   if (ability.dirValue === "2DD.0") {
@@ -401,6 +403,24 @@ export default {
       //     this.temNumber3 = Number(ability.currValue);
       //   }
       // });
+      if(ablityId1[0] !=""){
+        ablityId1.forEach(id => {
+          const ability = this.getAbilityData(id);
+        
+            // console.log(this.temNumber)
+            this.temNumber2 = Number(ability.currValue);
+          
+        });
+      }
+      if(ablityId2[0] !=""){
+        ablityId2.forEach(id => {
+          const ability = this.getAbilityData(id);
+        
+            // console.log(this.temNumber)
+            this.temNumber3 = Number(ability.currValue);
+          
+        });
+      }  
       this.hasSet = true;
     },
     sleep(delay){
@@ -410,12 +430,34 @@ export default {
         }
     },
     confirmSetting () {
-      this.sendFuncs("JSSD", this.temNumber);
+      const ablityId = this.formatItemsList[3].abilityId.split(",");
+      const ablityId1 = this.formatItemsList[4].abilityId.split(",");
+      const ablityId2 = this.formatItemsList[5].abilityId.split(",");
+      // this.sendFuncs("JSSD", this.temNumber);
       // this.sendFunc("2DE.0", this.humNumber);
+      if(ablityId[0] !=""){
+        ablityId.forEach(id => {
+          const ability = this.getAbilityData(id);
+            this.sendFuncs(ability.dirValue, this.temNumber);
+        });
+      }
+      
       this.sleep(800)
-      this.sendFuncs("CSSD", this.temNumber2);
+      if(ablityId1 !=""){
+        ablityId1.forEach(id => {
+          const ability = this.getAbilityData(id);
+            this.sendFuncs(ability.dirValue, this.temNumber2);
+        });
+      }
+      
       this.sleep(1000)
-      this.sendFuncs("2DD.0", this.temNumber3);
+      if(ablityId2 !=""){
+         ablityId2.forEach(id => {
+          const ability = this.getAbilityData(id);
+          this.sendFuncs(ability.dirValue, this.temNumber3);
+        });
+      }
+     
     },
     sendFuncs (funcId, value, cb) {
       // 发送指令
@@ -516,6 +558,9 @@ export default {
         return;
       }
       const option = data.abilityOptionList;
+
+
+
 
       this.currentSpeedLeftIndexLabel =
         option[index].optionDefinedName || option[index].optionName;
@@ -1121,7 +1166,7 @@ export default {
       this.img = currentBak;
     },
     getLocation () {
-      getLocation(this.deviceId).then(res => {
+      getLocation(this.masterDeviceId).then(res => {
         const data = res.data;
 
         // 取地址的省市区信息
@@ -1137,7 +1182,7 @@ export default {
       });
     },
     getWeather () {
-      getWeather(this.deviceId).then(res => {
+      getWeather(this.masterDeviceId).then(res => {
         const data = res.data;
 
         this.weather = data.weather;

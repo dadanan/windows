@@ -691,8 +691,8 @@ export default {
         const data1 = this.abilitysList.find(item => item.abilityId == this.formatItemsList[7].abilityId);
         // 回水温度
         const data2 = this.abilitysList.find(item => item.abilityId == this.formatItemsList[8].abilityId);
-        this.waterTemp1 = data1.currValue / 10;
-        this.waterTemp2 = data2.currValue / 10;
+        this.waterTemp1 = data1.currValue;
+        this.waterTemp2 = data2.currValue;
       };
 
       updateCurrData();

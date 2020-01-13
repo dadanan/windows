@@ -101,7 +101,7 @@
           <span>TVOC</span>
         </div>
         <div class='right'>
-          {{Number(getAbilityData(formatItemsList[4].abilityId).currValue) / 100}}<em>mg/m³</em>
+          {{Number(getAbilityData(formatItemsList[4].abilityId).currValue)}}<em>mg/m³</em>
         </div>
       </div>
       <div class='box' v-if='formatItemsList[5] && formatItemsList[5].abilityId'>
@@ -111,7 +111,7 @@
           <span>甲醛</span>
         </div>
         <div class='right'>
-          {{Number(getAbilityData(formatItemsList[5].abilityId).currValue) / 100}}<em>mg/m³</em>
+          {{Number(getAbilityData(formatItemsList[5].abilityId).currValue)}}<em>mg/m³</em>
         </div>
       </div>
     </div>

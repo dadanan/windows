@@ -42,7 +42,7 @@
       <div class='current-info'>
         <p v-if='formatItemsList[1] && formatItemsList[1].showStatus'>
           {{formatItemsList[1] && formatItemsList[1].showName}}
-          <span class='strong'>{{((getAbilityData(formatItemsList[1].abilityId).currValue)/10) == 0 ? '0' : ((getAbilityData(formatItemsList[1].abilityId).currValue)/10)-50}}</span>
+          <span class='strong'>{{((getAbilityData(formatItemsList[1].abilityId).currValue)) == 0 ? '0' : ((getAbilityData(formatItemsList[1].abilityId).currValue))-50}}</span>
           ℃
         </p>
       </div>
